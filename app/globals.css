@@ -328,6 +328,18 @@ h2, .section-title {
   transform: translateY(1px);
 }
 
+.upload-dropzone.drag-active {
+  border-color: var(--neon-yellow);
+  background: rgba(255, 229, 0, 0.08);
+  box-shadow: 0 0 0 3px rgba(255, 229, 0, 0.3), 0 0 24px rgba(255, 229, 0, 0.15);
+  transform: scale(1.01);
+}
+
+.upload-dropzone.drag-active .upload-label,
+.upload-dropzone.drag-active .upload-hint {
+  color: var(--neon-yellow);
+}
+
 .upload-icon {
   font-size: 1.1rem;
   font-weight: bold;
@@ -821,4 +833,150 @@ input[type="text"]::placeholder {
   font-size: 0.8rem;
   font-weight: bold;
   opacity: 0.7;
+}
+
+/* Card reveal animation */
+@keyframes cardReveal {
+  from {
+    opacity: 0;
+    transform: scale(0.88) translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.result-card-animate {
+  animation: cardReveal 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Duotone overlay in LivePreview */
+.duotone-overlay {
+  position: absolute;
+  inset: 0;
+  mix-blend-mode: multiply;
+  background: linear-gradient(135deg, rgba(22, 89, 50, 0.5) 0%, rgba(255, 229, 0, 0.3) 100%);
+  border-radius: 50%;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* Duotone toggle button */
+.duotone-toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.duotone-btn {
+  font-family: var(--font-space-mono), monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.5px;
+}
+
+.duotone-btn:hover {
+  border-color: var(--neon-yellow);
+  color: var(--neon-yellow);
+}
+
+.duotone-btn--active {
+  border-color: var(--neon-yellow);
+  background: rgba(255, 229, 0, 0.12);
+  color: var(--neon-yellow);
+  box-shadow: 0 0 12px rgba(255, 229, 0, 0.25);
+}
+
+/* Mock X profile preview on result page */
+.social-preview-mock {
+  margin-top: 32px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.social-preview-label {
+  font-family: var(--font-press-start), monospace;
+  font-size: 9px;
+  color: rgba(0, 0, 0, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+
+.mock-x-card {
+  border-radius: 16px;
+  border: 1px solid #e1e8ed;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+}
+
+.mock-x-banner {
+  height: 80px;
+  background: linear-gradient(135deg, #165932 0%, #0d3d1f 100%);
+}
+
+.mock-x-body {
+  padding: 0 16px 16px;
+  position: relative;
+}
+
+.mock-x-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  margin-top: -32px;
+  display: block;
+  object-fit: cover;
+}
+
+.mock-x-info {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mock-x-name {
+  font-family: var(--font-space-mono), monospace;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f1419;
+}
+
+.mock-x-handle {
+  font-family: var(--font-space-mono), monospace;
+  font-size: 13px;
+  color: #536471;
+}
+
+.mock-x-bio {
+  font-family: var(--font-space-mono), monospace;
+  font-size: 13px;
+  color: #0f1419;
+  margin-top: 6px;
+}
+
+.mock-x-follow-btn {
+  margin-top: 10px;
+  align-self: flex-start;
+  font-family: var(--font-space-mono), monospace;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 16px;
+  border-radius: 999px;
+  border: none;
+  background: #0f1419;
+  color: #fff;
+  cursor: default;
 }

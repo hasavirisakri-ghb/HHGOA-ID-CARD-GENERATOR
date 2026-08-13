@@ -18,6 +18,21 @@ function dataUrlToFile(dataUrl, filename) {
   return new File([bytes], filename, { type: mime });
 }
 
+async function uploadToBlob(dataUrl) {
+  try {
+    const res = await fetch(dataUrl);
+    const blob = await res.blob();
+    const formData = new FormData();
+    formData.append('file', blob, 'hhgoa-pfp-frame.png');
+    const response = await fetch('/api/upload-frame', { method: 'POST', body: formData });
+    if (!response.ok) return null;
+    const { url } = await response.json();
+    return url;
+  } catch {
+    return null;
+  }
+}
+
 export default function ResultPage() {
   const router = useRouter();
   const [cardUrl, setCardUrl] = useState(null);
@@ -32,6 +47,23 @@ export default function ResultPage() {
       router.push('/');
     }
   }, [router]);
+
+  useEffect(() => {
+    if (!cardUrl) return;
+    // Haptic feedback on mobile
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate(200);
+    }
+    // Confetti — canvas-confetti not in package.json; silently skips if unavailable
+    import('canvas-confetti').then(({ default: confetti }) => {
+      confetti({
+        particleCount: 120,
+        spread: 80,
+        origin: { y: 0.6 },
+        colors: ['#FFE500', '#FF007F', '#165932', '#ffffff'],
+      });
+    }).catch(() => {});
+  }, [cardUrl]);
 
   const triggerDownload = () => {
     if (!cardUrl) return;
@@ -93,7 +125,17 @@ export default function ResultPage() {
     }
 
     triggerDownload();
-    openTweetIntent();
+    const blobUrl = await uploadToBlob(cardUrl);
+    if (blobUrl) {
+      const text = `${SHARE_TEXT} ${SITE_URL} ${HASHTAG_TEXT}`;
+      window.open(
+        `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(blobUrl)}`,
+        '_blank',
+        'noopener,noreferrer'
+      );
+    } else {
+      openTweetIntent();
+    }
     setShareHint('Image downloaded — attach it in the X post that just opened.');
     setIsSharing(false);
   };
@@ -104,7 +146,7 @@ export default function ResultPage() {
     <div className="result-page">
       <div className="success-badge">✓ Your PFP Profile Frame is Ready</div>
 
-      <div className="result-card-container">
+      <div className="result-card-container result-card-animate">
         <img src={cardUrl} alt="Your generated HH Goa 2026 profile picture frame" className="result-card-image" />
       </div>
 
@@ -125,6 +167,24 @@ export default function ResultPage() {
       <div className="share-hint" role="status" aria-live="polite">
         {shareHint}
       </div>
+
+      {cardUrl && (
+        <div className="social-preview-mock">
+          <p className="social-preview-label">Preview on X</p>
+          <div className="mock-x-card">
+            <div className="mock-x-banner" />
+            <div className="mock-x-body">
+              <img src={cardUrl} className="mock-x-avatar" alt="Your PFP preview" />
+              <div className="mock-x-info">
+                <span className="mock-x-name">Your Name</span>
+                <span className="mock-x-handle">@yourhandle</span>
+                <span className="mock-x-bio">Builder @ HH Goa 2026 🌴</span>
+                <button className="mock-x-follow-btn">Follow</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="footer">
         Hacker Goa House 2026 • Build in Goa, Ship from Paradise
