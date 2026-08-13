@@ -45,15 +45,25 @@ export default function ResultPage() {
         <img src={cardUrl} alt="Your Builder Pass" style={{ width: '100%', height: 'auto', display: 'block' }} />
       </div>
 
+      {/* Horizontal action buttons container */}
       <div className="result-actions-row">
-        <button className="btn btn-primary result-btn" onClick={handleDownload}>
+        <button 
+          className="btn result-btn-download" 
+          onClick={handleDownload}
+        >
           ⬇ Download Pass
         </button>
-        <button className="btn btn-share result-btn" onClick={handleShare}>
+        <button 
+          className="btn result-btn-share" 
+          onClick={handleShare}
+        >
           ✕ Share to X
         </button>
-        <button className="btn btn-secondary result-btn" onClick={() => router.push('/')}>
-          ↻ Generate Another Pass
+        <button 
+          className="btn result-btn-another" 
+          onClick={() => router.push('/')}
+        >
+          ↻ Generate Another
         </button>
       </div>
 

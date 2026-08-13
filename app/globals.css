@@ -259,7 +259,6 @@ input[type="text"]:focus {
   transition: all 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  width: 100%;
 }
 
 .btn-primary {
@@ -272,36 +271,6 @@ input[type="text"]:focus {
 .btn-primary:hover {
   transform: translateY(-3px) scale(1.01);
   box-shadow: 0 7px 0 #B3A000, 0 15px 30px rgba(255, 229, 0, 0.45);
-}
-
-.btn-share {
-  background: #FFFFFF;
-  color: #111827;
-  border-color: #E5E7EB;
-  box-shadow: 0 4px 0 #D1D5DB, 0 10px 20px rgba(0,0,0,0.1);
-}
-
-.btn-share:hover {
-  background: #F9FAFB;
-  transform: translateY(-3px) scale(1.01);
-  box-shadow: 0 7px 0 #9CA3AF, 0 15px 25px rgba(0,0,0,0.15);
-}
-
-.btn-secondary {
-  background: var(--forest-green);
-  color: #FFFFFF;
-  border-color: var(--forest-green);
-  box-shadow: 0 4px 0 #0E3D22, 0 10px 20px rgba(0,0,0,0.2);
-}
-
-.btn-secondary:hover {
-  background: #124B2A;
-  transform: translateY(-3px) scale(1.01);
-  box-shadow: 0 7px 0 #082414, 0 15px 25px rgba(0,0,0,0.3);
-}
-
-.btn:active {
-  transform: translateY(2px) scale(0.99);
 }
 
 .btn-block {
@@ -364,7 +333,7 @@ input[type="text"]:focus {
   display: none !important;
 }
 
-/* Collision-Proof Floating Stickers */
+/* Collision-Proof Floating Stickers (Larger 170px width) */
 .stickers-container {
   position: absolute;
   top: 0;
@@ -470,21 +439,71 @@ input[type="text"]:focus {
 }
 
 .result-actions-row {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  width: min(100%, 650px);
-  margin-bottom: 2rem;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 1.25rem !important;
+  width: min(100%, 750px) !important;
+  margin: 1rem auto 2.5rem auto !important;
 }
 
-@media (min-width: 640px) {
+.result-btn-download {
+  flex: 1 1 200px !important;
+  max-width: 240px !important;
+  background: #165932 !important;
+  color: #FFFFFF !important;
+  border: 2px solid #165932 !important;
+  box-shadow: 0 6px 16px rgba(22, 89, 50, 0.35) !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+}
+
+.result-btn-download:hover {
+  background: #0F3D22 !important;
+  transform: translateY(-2px) !important;
+}
+
+.result-btn-share {
+  flex: 1 1 200px !important;
+  max-width: 240px !important;
+  background: #FFFFFF !important;
+  color: #000000 !important;
+  border: 2px solid #000000 !important;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15) !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+}
+
+.result-btn-share:hover {
+  background: #F3F4F6 !important;
+  transform: translateY(-2px) !important;
+}
+
+.result-btn-another {
+  flex: 1 1 200px !important;
+  max-width: 240px !important;
+  background: #FFE500 !important;
+  color: #000000 !important;
+  border: 2px solid #B3A000 !important;
+  box-shadow: 0 6px 16px rgba(255, 229, 0, 0.45) !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+}
+
+.result-btn-another:hover {
+  background: #E6CE00 !important;
+  transform: translateY(-2px) !important;
+}
+
+@media (max-width: 639px) {
   .result-actions-row {
-    flex-direction: row;
+    flex-direction: column !important;
   }
-  
-  .result-btn {
-    flex: 1;
-    white-space: nowrap;
+  .result-btn-download, .result-btn-share, .result-btn-another {
+    max-width: 100% !important;
+    width: 100% !important;
   }
 }
 
