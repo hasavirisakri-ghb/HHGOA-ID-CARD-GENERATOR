@@ -50,7 +50,7 @@ export default function ResultPage() {
         display: 'flex',
         flexDirection: 'row',
         flexWrap: 'wrap',
-        justify-content: 'center',
+        justifyContent: 'center',
         alignItems: 'center',
         gap: '1rem',
         width: '100%',
