@@ -37,11 +37,14 @@ export default function Controls({
   };
 
   return (
-    <div className="controls-panel animate-fade-in" style={{ animationDelay: '0.1s' }}>
-      <h2 className="section-title">✦ CARD CONTROLS</h2>
+    <div className="controls-panel animate-fade-in">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+        <h2 className="section-title">📷 EDITABLE CARD CONTROLS</h2>
+        <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', fontFamily: 'Space Mono' }}>2048×2048 FINAL ID</span>
+      </div>
       
       <div className="control-group">
-        <label className="control-label">📸 PHOTO</label>
+        <label className="control-label">📷 PHOTO CONTROLS</label>
         <input 
           type="file" 
           ref={fileInputRef} 
@@ -54,10 +57,10 @@ export default function Controls({
         </button>
         
         <div style={{ marginTop: '1rem' }}>
-          <label className="control-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'rgba(255,255,255,0.7)', marginBottom: '0.3rem' }}>
             <span>Zoom</span>
             <span>{Math.round(zoom * 100)}%</span>
-          </label>
+          </div>
           <input 
             type="range" 
             min="0.1" 
@@ -68,49 +71,61 @@ export default function Controls({
             className="zoom-slider"
           />
         </div>
-        <span className="tip-text">💡 Tip: Drag directly on the preview to pan</span>
+        <span className="tip-text">💡 Tip: Click & drag directly on the photo frame to pan. Scroll to zoom!</span>
       </div>
 
       <div className="control-group">
         <label className="control-label">👤 YOUR NAME</label>
-        <input 
-          type="text" 
-          placeholder="Enter your name" 
-          value={name} 
-          onChange={(e) => onNameChange(e.target.value)} 
-          maxLength={15}
-        />
+        <div className="input-with-icon">
+          <span className="input-icon">👤</span>
+          <input 
+            type="text" 
+            placeholder="Enter your name" 
+            value={name} 
+            onChange={(e) => onNameChange(e.target.value)} 
+            maxLength={15}
+          />
+        </div>
       </div>
 
       <div className="control-group">
-        <label className="control-label">⚡ SKILL / STACK</label>
-        <input 
-          type="text" 
-          placeholder="Enter your skill (e.g. FULL STACK)" 
-          value={skill} 
-          onChange={(e) => onSkillChange(e.target.value)} 
-          maxLength={20}
-        />
+        <label className="control-label">🔑 SKILL / STACK</label>
+        <div className="input-with-icon">
+          <span className="input-icon">🔑</span>
+          <input 
+            type="text" 
+            placeholder="Enter your skill / stack" 
+            value={skill} 
+            onChange={(e) => onSkillChange(e.target.value)} 
+            maxLength={20}
+          />
+        </div>
       </div>
 
       <div className="control-group">
-        <label className="control-label">🏷️ BUILDER TITLE</label>
-        <input 
-          type="text" 
-          placeholder="Enter builder title" 
-          value={title} 
-          onChange={(e) => onTitleChange(e.target.value)} 
-          maxLength={20}
-        />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <label className="control-label">🎗️ BUILDER TITLE</label>
+          <span style={{ fontSize: '0.65rem', color: 'var(--neon-yellow)', cursor: 'pointer' }}>✨ Generate with AI</span>
+        </div>
+        <div className="input-with-icon">
+          <span className="input-icon">🎗️</span>
+          <input 
+            type="text" 
+            placeholder="Enter builder title" 
+            value={title} 
+            onChange={(e) => onTitleChange(e.target.value)} 
+            maxLength={20}
+          />
+        </div>
       </div>
 
       <button 
         className="btn btn-primary btn-block" 
         onClick={handleGenerateClick}
         disabled={isGenerating}
-        style={{ marginTop: '1rem', minHeight: '60px', fontSize: '1.2rem' }}
+        style={{ marginTop: '1.5rem', minHeight: '54px', fontSize: '1rem' }}
       >
-        {isGenerating ? 'GENERATING...' : '⚡ GENERATE PASS'}
+        {isGenerating ? 'GENERATING PASS...' : '⚡ GENERATE PASS'}
       </button>
     </div>
   );
