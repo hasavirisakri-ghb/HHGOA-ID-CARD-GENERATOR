@@ -16,6 +16,11 @@
   padding: 0;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   background-color: var(--forest-green);
   background-image: linear-gradient(rgba(14, 45, 27, 0.45), rgba(14, 45, 27, 0.65)), url('/bg-goa.jpg');
@@ -26,6 +31,31 @@ body {
   font-family: 'Space Mono', monospace;
   min-height: 100vh;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Fixed backgrounds cause jank on iOS Safari; use scroll attachment on touch devices */
+@media (hover: none) and (pointer: coarse) {
+  body {
+    background-attachment: scroll;
+  }
+}
+
+button, input {
+  font: inherit;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a, button, [role="button"], input[type="range"] {
+  touch-action: manipulation;
+}
+
+:focus-visible {
+  outline: 2px solid var(--neon-yellow);
+  outline-offset: 2px;
 }
 
 /* Fluid Typography */
@@ -107,12 +137,21 @@ h2, .section-title {
   animation: fadeIn 0.4s ease-out forwards;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* Layout Wrapper */
 .app-layout {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  padding: 1.5rem;
+  padding: clamp(1rem, 4vw, 1.5rem);
   max-width: 1280px;
   margin: 0 auto;
   position: relative;
@@ -126,7 +165,7 @@ h2, .section-title {
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--glass-border);
   border-radius: 20px;
-  padding: 1.75rem;
+  padding: clamp(1.1rem, 4vw, 1.75rem);
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
 }
 
@@ -134,25 +173,33 @@ h2, .section-title {
   margin-bottom: 0.5rem;
 }
 
+/* A grid of exactly 3 equal columns always fits the container width, no
+   horizontal scrolling needed at any viewport — cards shrink together instead
+   of overflowing. Extra top padding gives the active card's lift+glow room to
+   render without being clipped by the panel edge. */
 .template-scroll {
-  display: flex;
-  gap: 1rem;
-  overflow-x: auto;
-  padding-bottom: 0.5rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(0.4rem, 2vw, 1rem);
+  padding: 0.6rem 0.15rem 0.35rem;
 }
 
 .template-card {
   background: rgba(0,0,0,0.4);
   border: 2px solid rgba(255,255,255,0.15);
   border-radius: 14px;
-  padding: 0.5rem;
+  padding: clamp(0.3rem, 1.5vw, 0.5rem);
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  min-width: 120px;
+  gap: 0.4rem;
+  min-width: 0; /* let grid items shrink below their content's natural width */
   transition: all 0.2s ease;
+}
+
+.template-card:active {
+  transform: scale(0.97);
 }
 
 .template-card.active {
@@ -162,16 +209,18 @@ h2, .section-title {
 }
 
 .template-thumb {
-  width: 90px;
-  height: 90px;
+  width: 100%;
+  aspect-ratio: 1 / 1;
   object-fit: cover;
   border-radius: 8px;
 }
 
 .template-label {
-  font-size: 0.75rem;
+  font-size: clamp(0.58rem, 2.6vw, 0.72rem);
   font-weight: 700;
   color: var(--white);
+  text-align: center;
+  line-height: 1.25;
 }
 
 .main-content {
@@ -186,13 +235,31 @@ h2, .section-title {
   }
 }
 
-/* On mobile, reorder grid so preview is above controls */
+/* On mobile, show the live preview above the controls so people see the
+   frame update as they type/crop, instead of scrolling to find it. */
 @media (max-width: 819px) {
   .controls-panel { order: 2; }
   .preview-panel { order: 1; }
 }
 
 /* Controls & Inputs */
+.controls-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.controls-meta {
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.62);
+  font-family: 'Space Mono', monospace;
+  white-space: nowrap;
+}
+
 .control-group {
   margin-bottom: 1.25rem;
   padding-bottom: 1rem;
@@ -208,6 +275,29 @@ h2, .section-title {
   letter-spacing: 0.5px;
 }
 
+.control-hint {
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+  margin-top: 0.4rem;
+}
+
+.control-error {
+  font-size: 0.75rem;
+  color: #FF6B9D;
+  text-align: center;
+  margin-top: 0.5rem;
+  font-weight: 700;
+}
+
+.zoom-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.3rem;
+}
+
 /* Dashed Upload Dropzone */
 .upload-dropzone {
   display: flex;
@@ -217,7 +307,8 @@ h2, .section-title {
   background: rgba(255, 229, 0, 0.08);
   border: 2px dashed var(--neon-yellow);
   border-radius: 12px;
-  padding: 0.85rem 1rem;
+  padding: 0.95rem 1rem;
+  min-height: 52px;
   cursor: pointer;
   color: var(--neon-yellow);
   font-weight: 700;
@@ -262,8 +353,10 @@ input[type="text"] {
   border: 1px solid rgba(255, 255, 255, 0.22);
   color: white;
   font-family: 'Space Mono', monospace;
-  font-size: clamp(0.85rem, 1vw, 0.95rem);
+  /* Keep >=16px so iOS Safari doesn't auto-zoom the page on focus */
+  font-size: 16px;
   padding: 0.85rem 1rem 0.85rem 2.8rem;
+  min-height: 48px;
   border-radius: 10px;
   outline: none;
   transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -276,13 +369,46 @@ input[type="text"]:focus {
   background: rgba(0, 0, 0, 0.6);
 }
 
+input[type="text"]::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
 /* Zoom Slider */
 .zoom-slider {
   width: 100%;
   margin-top: 0.5rem;
   accent-color: var(--neon-yellow);
+  height: 28px; /* real hit-area height, not just the visual track */
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+/* `accent-color` alone doesn't reliably enlarge the actual tappable thumb across
+   browsers, so size it explicitly to a >=28px touch target on both engines. */
+.zoom-slider::-webkit-slider-runnable-track {
   height: 6px;
   border-radius: 3px;
+}
+.zoom-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--neon-yellow);
+  margin-top: -10px;
+  cursor: pointer;
+}
+.zoom-slider::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+}
+.zoom-slider::-moz-range-thumb {
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 50%;
+  background: var(--neon-yellow);
   cursor: pointer;
 }
 
@@ -294,15 +420,21 @@ input[type="text"]:focus {
   gap: 0.5rem;
   font-family: 'Space Mono', monospace;
   font-weight: 700;
-  font-size: clamp(0.75rem, 1.2vw, 0.85rem);
+  font-size: clamp(0.78rem, 1.2vw, 0.85rem);
   padding: 0.8rem 1.2rem;
-  min-height: 48px;
+  min-height: 50px;
   border-radius: 12px;
   cursor: pointer;
   border: 2px solid transparent;
-  transition: all 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
 }
 
 .btn-primary {
@@ -312,13 +444,24 @@ input[type="text"]:focus {
   box-shadow: 0 4px 0 #B3A000, 0 10px 20px rgba(0,0,0,0.2);
 }
 
-.btn-primary:hover {
+.btn-primary:not(:disabled):hover {
   transform: translateY(-3px) scale(1.01);
   box-shadow: 0 7px 0 #B3A000, 0 15px 30px rgba(255, 229, 0, 0.45);
 }
 
+.btn-primary:not(:disabled):active {
+  transform: translateY(0);
+  box-shadow: 0 2px 0 #B3A000, 0 6px 14px rgba(0,0,0,0.25);
+}
+
 .btn-block {
   width: 100%;
+}
+
+.btn-generate {
+  margin-top: 1.5rem;
+  min-height: 54px;
+  font-size: 1rem;
 }
 
 .tip-text {
@@ -329,60 +472,105 @@ input[type="text"]:focus {
   display: block;
 }
 
+.hidden {
+  display: none !important;
+}
+
 /* Preview Area */
 .preview-panel {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-}
-
-.canvas-wrapper {
-  position: relative;
-  width: min(100%, 420px);
-  aspect-ratio: 9 / 16;
-  background: #0d2817;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 20px 45px rgba(0,0,0,0.65);
-  border: 1px solid rgba(255,255,255,0.15);
+  gap: 0.5rem;
 }
 
 .canvas-wrapper-pfp {
   position: relative;
-  width: min(100%, 450px);
+  width: min(100%, 440px);
   aspect-ratio: 1 / 1;
   background: #0d2817;
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 20px 45px rgba(0,0,0,0.65);
   border: 1px solid rgba(255,255,255,0.15);
+  touch-action: none;
 }
 
-/* Format Toggle Pill */
-.format-toggle {
-  display: inline-flex;
-  background: rgba(0,0,0,0.5);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 30px;
-  padding: 0.25rem;
-  margin: 0 auto 1.5rem auto;
+.cropper-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
 }
 
-.format-tab {
-  padding: 0.5rem 1.5rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
+.preview-empty-state {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #165932;
+  color: rgba(255,255,255,0.55);
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 2rem;
+}
+
+.template-overlay {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  pointer-events: none;
+}
+
+.text-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Single bottom-center badge. Position/size mirror the canvas geometry in
+   lib/frameRenderer.js (badge width 260/1080 = 24.1%, bottom edge at
+   y=1032/1080 = 4.4% from the bottom) so the live editor preview matches the
+   exported PNG, and both stay inside the circle X inscribes when a square
+   upload is cropped into a round avatar. */
+.badge-safezone {
+  position: absolute;
+  left: 50%;
+  bottom: 4.4%;
+  transform: translateX(-50%);
+  width: 24.1%;
+  min-width: 118px;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1.5px solid var(--neon-yellow);
+  border-radius: 8px;
+  padding: 5px 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+  text-align: center;
+  overflow: hidden;
+}
+
+.badge-brand-line {
+  color: var(--neon-yellow);
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: clamp(0.62rem, 2.6vw, 0.85rem);
+  white-space: nowrap;
+}
+
+.badge-identity-line {
+  margin-top: 2px;
+  font-family: 'Space Mono', monospace;
   font-weight: 700;
-  color: rgba(255,255,255,0.5);
-  cursor: pointer;
-  user-select: none;
-  transition: all 0.2s ease;
+  font-size: clamp(0.55rem, 2.2vw, 0.78rem);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
-.format-tab.active {
-  background: var(--neon-yellow);
-  color: var(--black);
+.badge-user-name {
+  color: var(--neon-yellow);
 }
 
 /* Landing Page Footer */
@@ -403,11 +591,6 @@ input[type="text"]:focus {
   color: var(--neon-yellow);
   font-weight: 700;
   letter-spacing: 0.5px;
-}
-
-/* Hidden elements */
-.hidden {
-  display: none !important;
 }
 
 /* Collision-Proof Floating Stickers */
@@ -495,6 +678,20 @@ input[type="text"]:focus {
   }
 }
 
+/* Loading overlay (upload/route transition states) */
+.loading-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.75rem;
+  color: var(--neon-yellow);
+  letter-spacing: 1px;
+  text-align: center;
+  padding: 2rem;
+}
+
 /* Result Page Specific */
 .result-page {
   background-color: var(--cream);
@@ -503,11 +700,12 @@ input[type="text"]:focus {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem 1rem;
+  padding: clamp(1.25rem, 5vw, 2rem) 1rem;
 }
 
 .result-card-container {
   width: min(100%, 440px);
+  aspect-ratio: 1 / 1;
   margin: 1.5rem auto 2rem auto;
   box-shadow: 0 25px 50px rgba(0,0,0,0.25);
   border-radius: 20px;
@@ -515,72 +713,89 @@ input[type="text"]:focus {
   animation: fadeIn 0.5s ease-out;
 }
 
+.result-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .result-actions-row {
-  display: flex !important;
-  flex-direction: row !important;
-  flex-wrap: wrap !important;
-  justify-content: center !important;
-  align-items: center !important;
-  gap: 1.25rem !important;
-  width: min(100%, 750px) !important;
-  margin: 1rem auto 2.5rem auto !important;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
+  gap: 1rem;
+  width: min(100%, 750px);
+  margin: 0.5rem auto 1rem auto;
+}
+
+.result-btn-download,
+.result-btn-share,
+.result-btn-another {
+  flex: 1 1 200px;
+  max-width: 240px;
+  min-height: 50px;
 }
 
 .result-btn-download {
-  flex: 1 1 200px !important;
-  max-width: 240px !important;
-  background: #165932 !important;
-  color: #FFFFFF !important;
-  border: 2px solid #165932 !important;
-  box-shadow: 0 6px 16px rgba(22, 89, 50, 0.35) !important;
-  font-weight: 700 !important;
-  white-space: nowrap !important;
+  background: #165932;
+  color: #FFFFFF;
+  border-color: #165932;
+  box-shadow: 0 6px 16px rgba(22, 89, 50, 0.35);
 }
 
-.result-btn-download:hover {
-  background: #0F3D22 !important;
-  transform: translateY(-2px) !important;
+.result-btn-download:not(:disabled):hover {
+  background: #0F3D22;
+  transform: translateY(-2px);
 }
 
 .result-btn-share {
-  flex: 1 1 200px !important;
-  max-width: 240px !important;
-  background: #FFFFFF !important;
-  color: #000000 !important;
-  border: 2px solid #000000 !important;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.15) !important;
-  font-weight: 700 !important;
-  white-space: nowrap !important;
+  background: #000000;
+  color: #FFFFFF;
+  border-color: #000000;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
 }
 
-.result-btn-share:hover {
-  background: #F3F4F6 !important;
-  transform: translateY(-2px) !important;
+.result-btn-share:not(:disabled):hover {
+  background: #1a1a1a;
+  transform: translateY(-2px);
 }
 
 .result-btn-another {
-  flex: 1 1 200px !important;
-  max-width: 240px !important;
-  background: #FFE500 !important;
-  color: #000000 !important;
-  border: 2px solid #B3A000 !important;
-  box-shadow: 0 6px 16px rgba(255, 229, 0, 0.45) !important;
-  font-weight: 700 !important;
-  white-space: nowrap !important;
+  background: #FFE500;
+  color: #000000;
+  border-color: #B3A000;
+  box-shadow: 0 6px 16px rgba(255, 229, 0, 0.45);
 }
 
-.result-btn-another:hover {
-  background: #E6CE00 !important;
-  transform: translateY(-2px) !important;
+.result-btn-another:not(:disabled):hover {
+  background: #E6CE00;
+  transform: translateY(-2px);
+}
+
+.share-hint {
+  min-height: 1.2rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--forest-green);
+  text-align: center;
+  margin-bottom: 1.5rem;
+  max-width: 320px;
 }
 
 @media (max-width: 639px) {
   .result-actions-row {
-    flex-direction: column !important;
+    flex-direction: column;
   }
   .result-btn-download, .result-btn-share, .result-btn-another {
-    max-width: 100% !important;
-    width: 100% !important;
+    /* Reset the row layout's 200px flex-basis — in a column flex container that
+       basis applies to height, not width, which was blowing these up to ~200px
+       tall on every phone. Pin them back to their natural button height. */
+    flex: 0 0 auto;
+    max-width: 100%;
+    width: 100%;
   }
 }
 
@@ -595,6 +810,7 @@ input[type="text"]:focus {
   align-items: center;
   gap: 0.5rem;
   margin-top: 1rem;
+  text-align: center;
   animation: fadeIn 0.8s ease-out;
 }
 

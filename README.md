@@ -1,36 +1,36 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# HH Goa 2026 — PFP Frame Generator
 
-## Getting Started
+Upload a photo, pick one of three HH Goa 2026 frame styles, add your name/handle, and get a
+branded 1080×1080 profile picture — ready to download or share straight to X with `#FrameInGoa`.
 
-First, run the development server:
+No login, no signup gate — upload → frame → download/share in one pass.
+
+## Getting started
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## How it works
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `app/page.js` — upload/crop/customize screen (photo upload incl. HEIC, live cropper, template
+  picker, name/handle fields).
+- `lib/frameRenderer.js` — composites the cropped photo + chosen frame PNG + text badges onto a
+  1080×1080 `<canvas>` and exports a real downloadable PNG.
+- `app/result/page.js` — download button, and a Share to X button that uses the Web Share API to
+  attach the generated image directly (falls back to a pre-filled tweet composer on browsers
+  without file-sharing support).
+- `app/opengraph-image.js` — generates the OG/Twitter link-preview image for the tool itself.
 
-## Learn More
+## Regenerating frame templates
 
-To learn more about Next.js, take a look at the following resources:
+`scripts/process-frames.mjs` punches the circular photo-hole into a source frame image and
+exports it as WebP (kept small for mobile speed) into `public/frames/`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deploying
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Set `NEXT_PUBLIC_SITE_URL` to your production URL if you're not deploying on Vercel, so the
+Open Graph / Twitter card image tags resolve to an absolute URL instead of `localhost`.

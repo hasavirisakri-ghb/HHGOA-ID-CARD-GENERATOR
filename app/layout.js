@@ -1,4 +1,5 @@
 import { Playfair_Display, Space_Mono, Press_Start_2P } from 'next/font/google';
+import { SITE_URL } from '../lib/site';
 import './globals.css';
 
 const playfair = Playfair_Display({
@@ -20,13 +21,40 @@ const pressStart = Press_Start_2P({
   variable: '--font-press-start',
 });
 
+const TITLE = "HH Goa 2026 | PFP Frame Generator";
+const DESCRIPTION = "Upload a photo, get a branded HH Goa 2026 profile picture frame in seconds. Download it or share it straight to X with #FrameInGoa.";
+
 export const metadata = {
-  title: "HH Goa 2026 | PFP Frame Generator",
-  description: "Instantly generate your branded Hacker House Goa 2026 profile picture frame.",
+  metadataBase: new URL(SITE_URL),
+  title: TITLE,
+  description: DESCRIPTION,
+  applicationName: 'HH Goa 2026 PFP Frame Generator',
+  keywords: ['HH Goa 2026', 'Hacker House Goa', 'PFP frame', 'profile picture generator', 'FrameInGoa'],
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    url: SITE_URL,
+    siteName: 'HH Goa 2026',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: TITLE,
+    description: DESCRIPTION,
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export const viewport = {
-  themeColor: "#165932",
+  themeColor: '#165932',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  colorScheme: 'dark',
 };
 
 export default function RootLayout({ children }) {
