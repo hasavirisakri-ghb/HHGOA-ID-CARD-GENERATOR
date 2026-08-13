@@ -1,6 +1,7 @@
 'use client';
 
 import Cropper from 'react-easy-crop';
+import CanvasFrameOverlay from './CanvasFrameOverlay';
 
 export default function LivePreview({
   selectedTemplate,
@@ -11,13 +12,13 @@ export default function LivePreview({
   onCropChange,
   onCropComplete,
   name,
+  duotone,
+  customSettings,
 }) {
+  const templateType = selectedTemplate?.type;
+  const isCanvasBased = templateType === 'canvas' || templateType === 'custom';
+
   const overlaySrc = selectedTemplate?.src || '/frames/tropical-cyber.webp';
-  // Templates can punch their photo hole at a smaller radius than the 430/1080
-  // default (see lib/templates.js `photoRadius`) when their own art needs a
-  // thinner border. The empty-state placeholder has to be constrained to that
-  // same hole, or its text spills past the visible circle and gets covered by
-  // the frame's opaque decoration outside it.
   const photoRadius = selectedTemplate?.photoRadius || 430;
   const holeDiameterPct = (photoRadius * 2 / 1080) * 100;
 
@@ -53,15 +54,26 @@ export default function LivePreview({
           </div>
         )}
 
-        {/* Template Overlay */}
-        <div
-          className="template-overlay"
-          style={{ backgroundImage: `url(${overlaySrc})` }}
-        />
+        {duotone && (
+          <div className="duotone-overlay" style={{ pointerEvents: 'none' }} />
+        )}
 
-        {/* Dynamic Text Overlay — a single bottom-center badge, kept inside the
-            circle X inscribes when cropping a square upload into a round avatar,
-            so branding + name survive being used as an actual PFP. */}
+        {/* Frame overlay — canvas draw for canvas/custom types, CSS bg-image for WebP frames */}
+        {isCanvasBased ? (
+          <CanvasFrameOverlay
+            templateId={selectedTemplate.id}
+            templateType={templateType}
+            photoRadius={photoRadius}
+            customSettings={customSettings}
+          />
+        ) : (
+          <div
+            className="template-overlay"
+            style={{ backgroundImage: `url(${overlaySrc})` }}
+          />
+        )}
+
+        {/* Bottom-centre name badge mirrors the canvas export geometry */}
         <div className="text-overlay">
           <div className="badge badge-safezone">
             <div className="badge-brand-line">HH GOA '26</div>

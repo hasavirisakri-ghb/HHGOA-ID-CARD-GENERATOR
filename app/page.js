@@ -7,6 +7,7 @@ import FloatingStickers from '../components/FloatingStickers';
 import TemplateSelector from '../components/TemplateSelector';
 import Controls from '../components/Controls';
 import LivePreview from '../components/LivePreview';
+import FrameBuilder from '../components/FrameBuilder';
 import { renderFrame } from '../lib/frameRenderer';
 import { templates } from '../lib/templates';
 
@@ -21,6 +22,13 @@ export default function Home() {
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
 
   const [name, setName] = useState('');
+  const [duotone, setDuotone] = useState(false);
+  const [customSettings, setCustomSettings] = useState({
+    borderStyle: 'neon',
+    borderColor: '#FFE500',
+    bgPreset: 'cyber',
+    stickers: [],
+  });
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState(null);
@@ -50,8 +58,12 @@ export default function Home() {
         userImage,
         croppedAreaPixels,
         templateSrc: selectedTemplate.src,
+        templateType: selectedTemplate.type,
+        templateId: selectedTemplate.id,
         photoRadius: selectedTemplate.photoRadius,
         name,
+        duotone,
+        customSettings,
       });
       const cardDataUrl = canvas.toDataURL('image/png');
 
@@ -76,6 +88,12 @@ export default function Home() {
         />
       </div>
 
+      {selectedTemplate?.type === 'custom' && (
+        <div className="glass-panel animate-fade-in">
+          <FrameBuilder settings={customSettings} onChange={setCustomSettings} />
+        </div>
+      )}
+
       <div className="glass-panel main-content">
         <Controls
           onImageUpload={setUserImage}
@@ -86,6 +104,9 @@ export default function Home() {
           onGenerate={handleGenerate}
           isGenerating={isGenerating}
           error={error}
+          onCropChange={setCrop}
+          duotone={duotone}
+          onDuotoneChange={setDuotone}
         />
 
         <LivePreview
@@ -97,6 +118,8 @@ export default function Home() {
           onCropChange={setCrop}
           onCropComplete={onCropComplete}
           name={name}
+          duotone={duotone}
+          customSettings={customSettings}
         />
       </div>
 

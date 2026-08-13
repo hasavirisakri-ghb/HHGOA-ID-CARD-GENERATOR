@@ -173,28 +173,34 @@ h2, .section-title {
   margin-bottom: 0.5rem;
 }
 
-/* A grid of exactly 3 equal columns always fits the container width, no
-   horizontal scrolling needed at any viewport — cards shrink together instead
-   of overflowing. Extra top padding gives the active card's lift+glow room to
-   render without being clipped by the panel edge. */
+/* Horizontal-scroll row per group. Cards have a fixed min-width so they never
+   become too small; on mobile the row scrolls; on wide screens cards spread. */
 .template-scroll {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: clamp(0.4rem, 2vw, 1rem);
-  padding: 0.6rem 0.15rem 0.35rem;
+  display: flex;
+  gap: 0.6rem;
+  padding: 0.6rem 0.1rem 0.75rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.template-scroll::-webkit-scrollbar {
+  display: none;
 }
 
 .template-card {
   background: rgba(0,0,0,0.4);
   border: 2px solid rgba(255,255,255,0.15);
   border-radius: 14px;
-  padding: clamp(0.3rem, 1.5vw, 0.5rem);
+  padding: 0.45rem;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.4rem;
-  min-width: 0; /* let grid items shrink below their content's natural width */
+  gap: 0.35rem;
+  flex: 0 0 clamp(100px, 28vw, 150px);
+  scroll-snap-align: start;
   transition: all 0.2s ease;
 }
 
@@ -216,11 +222,15 @@ h2, .section-title {
 }
 
 .template-label {
-  font-size: clamp(0.58rem, 2.6vw, 0.72rem);
+  font-size: 0.65rem;
   font-weight: 700;
   color: var(--white);
   text-align: center;
-  line-height: 1.25;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
 }
 
 .main-content {
@@ -326,6 +336,18 @@ h2, .section-title {
 
 .upload-dropzone:active {
   transform: translateY(1px);
+}
+
+.upload-dropzone.drag-active {
+  border-color: var(--neon-yellow);
+  background: rgba(255, 229, 0, 0.08);
+  box-shadow: 0 0 0 3px rgba(255, 229, 0, 0.3), 0 0 24px rgba(255, 229, 0, 0.15);
+  transform: scale(1.01);
+}
+
+.upload-dropzone.drag-active .upload-label,
+.upload-dropzone.drag-active .upload-hint {
+  color: var(--neon-yellow);
 }
 
 .upload-icon {
@@ -692,133 +714,695 @@ input[type="text"]::placeholder {
   padding: 2rem;
 }
 
-/* Result Page Specific */
+/* Result Page */
 .result-page {
-  background-color: var(--cream);
-  color: var(--black);
+  position: relative;
+  background: #080f0b;
+  color: var(--white);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: clamp(1.25rem, 5vw, 2rem) 1rem;
+  padding: clamp(1.5rem, 6vw, 3rem) 1.25rem 2rem;
+  overflow: hidden;
+  font-family: 'Space Mono', monospace;
 }
 
-.result-card-container {
-  width: min(100%, 440px);
+.result-bg-glow {
+  position: fixed;
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 140vw;
+  height: 140vw;
+  max-width: 1000px;
+  max-height: 1000px;
+  background: radial-gradient(ellipse at center, rgba(22, 89, 50, 0.3) 0%, transparent 65%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.result-header {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.result-eyebrow {
+  display: block;
+  font-size: clamp(0.58rem, 1.4vw, 0.7rem);
+  letter-spacing: 2.5px;
+  color: var(--neon-yellow);
+  text-transform: uppercase;
+  margin-bottom: 0.6rem;
+  opacity: 0.9;
+}
+
+.result-headline {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: clamp(2.4rem, 7vw, 4.4rem);
+  line-height: 1.05;
+  color: var(--white);
+  text-shadow: 0 4px 40px rgba(255, 255, 255, 0.12);
+  margin: 0;
+  text-align: center;
+}
+
+.result-stage {
+  position: relative;
+  z-index: 1;
+  width: min(88vw, 400px);
   aspect-ratio: 1 / 1;
-  margin: 1.5rem auto 2rem auto;
-  box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+  margin-bottom: 2.5rem;
+}
+
+.result-card-stack {
+  position: absolute;
+  inset: 0;
+  border-radius: 22px;
+  background: var(--forest-green);
+  transform: rotate(5deg) scale(0.94);
+  opacity: 0.45;
+  filter: blur(3px);
+}
+
+.result-card-wrap {
+  position: relative;
+  z-index: 1;
   border-radius: 20px;
   overflow: hidden;
-  animation: fadeIn 0.5s ease-out;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.07),
+    0 32px 80px rgba(0, 0, 0, 0.8),
+    0 0 60px rgba(22, 89, 50, 0.3);
 }
 
-.result-card-image {
+.result-card-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-.result-actions-row {
+@keyframes cardReveal {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(36px) rotate(-3deg);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(1.04) translateY(-5px) rotate(0.5deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0) rotate(0);
+  }
+}
+
+.result-card-animate {
+  animation: cardReveal 0.72s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.result-actions {
+  position: relative;
+  z-index: 1;
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: stretch;
-  gap: 1rem;
-  width: min(100%, 750px);
-  margin: 0.5rem auto 1rem auto;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: min(100%, 400px);
 }
 
-.result-btn-download,
+@media (min-width: 420px) {
+  .result-actions {
+    flex-direction: row;
+  }
+}
+
 .result-btn-share,
-.result-btn-another {
-  flex: 1 1 200px;
-  max-width: 240px;
-  min-height: 50px;
-}
-
 .result-btn-download {
-  background: #165932;
-  color: #FFFFFF;
-  border-color: #165932;
-  box-shadow: 0 6px 16px rgba(22, 89, 50, 0.35);
-}
-
-.result-btn-download:not(:disabled):hover {
-  background: #0F3D22;
-  transform: translateY(-2px);
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.5px;
+  padding: 0.9rem 1.2rem;
+  min-height: 52px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+  text-transform: uppercase;
 }
 
 .result-btn-share {
-  background: #000000;
-  color: #FFFFFF;
-  border-color: #000000;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+  background: #000;
+  color: #fff;
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
 }
 
 .result-btn-share:not(:disabled):hover {
-  background: #1a1a1a;
+  background: #111;
   transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6);
 }
 
-.result-btn-another {
-  background: #FFE500;
-  color: #000000;
-  border-color: #B3A000;
-  box-shadow: 0 6px 16px rgba(255, 229, 0, 0.45);
+.result-btn-share:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
-.result-btn-another:not(:disabled):hover {
-  background: #E6CE00;
+.result-btn-download {
+  background: var(--forest-green);
+  color: #fff;
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+}
+
+.result-btn-download:hover {
+  background: #1e7040;
   transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(22, 89, 50, 0.5);
 }
 
-.share-hint {
-  min-height: 1.2rem;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--forest-green);
+.result-btn-download.result-btn-done {
+  background: #0d5c2a;
+  color: var(--neon-yellow);
+}
+
+.result-btn-icon {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+}
+
+.result-share-hint {
+  position: relative;
+  z-index: 1;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.5);
   text-align: center;
-  margin-bottom: 1.5rem;
-  max-width: 320px;
+  margin-top: 0.75rem;
+  max-width: 300px;
+  line-height: 1.6;
 }
 
-@media (max-width: 639px) {
-  .result-actions-row {
-    flex-direction: column;
-  }
-  .result-btn-download, .result-btn-share, .result-btn-another {
-    /* Reset the row layout's 200px flex-basis — in a column flex container that
-       basis applies to height, not width, which was blowing these up to ~200px
-       tall on every phone. Pin them back to their natural button height. */
-    flex: 0 0 auto;
-    max-width: 100%;
-    width: 100%;
-  }
+.result-btn-redo {
+  position: relative;
+  z-index: 1;
+  margin-top: 1.75rem;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.48);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.76rem;
+  padding: 0.65rem 1.5rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.5px;
 }
 
-.success-badge {
-  background: rgba(22, 89, 50, 0.1);
-  color: var(--forest-green);
-  border: 1px solid var(--forest-green);
-  padding: 0.5rem 1.5rem;
-  border-radius: 30px;
-  font-weight: bold;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 1rem;
-  text-align: center;
-  animation: fadeIn 0.8s ease-out;
+.result-btn-redo:hover {
+  border-color: rgba(255, 255, 255, 0.38);
+  color: rgba(255, 255, 255, 0.8);
+  transform: translateY(-1px);
 }
 
-.footer {
+.result-footer {
+  position: relative;
+  z-index: 1;
   margin-top: auto;
-  padding: 2rem;
+  padding-top: 3rem;
   text-align: center;
-  font-size: 0.8rem;
-  font-weight: bold;
-  opacity: 0.7;
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.25);
+  letter-spacing: 0.5px;
+}
+
+/* Duotone overlay in LivePreview */
+.duotone-overlay {
+  position: absolute;
+  inset: 0;
+  mix-blend-mode: multiply;
+  background: linear-gradient(135deg, rgba(22, 89, 50, 0.5) 0%, rgba(255, 229, 0, 0.3) 100%);
+  border-radius: 50%;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* Photo filter toggle switch */
+.filter-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1.1rem;
+  padding: 0.5rem 0;
+}
+
+.filter-label {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.5rem;
+  color: rgba(255, 255, 255, 0.65);
+  letter-spacing: 0.5px;
+}
+
+.toggle-switch {
+  position: relative;
+  width: 46px;
+  height: 26px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: background 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.toggle-switch--on {
+  background: var(--neon-yellow);
+  border-color: var(--neon-yellow);
+  box-shadow: 0 0 12px rgba(255, 229, 0, 0.45);
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.7);
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: block;
+  pointer-events: none;
+}
+
+.toggle-switch--on .toggle-thumb {
+  transform: translateX(20px);
+  background: #000;
+}
+
+/* ─── Canvas frame overlay (CanvasFrameOverlay component) ─────────────────── */
+canvas.template-overlay {
+  background: transparent;
+}
+
+/* ─── Template thumbnail variants for non-WebP frames ────────────────────── */
+.template-thumb-custom {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  background: radial-gradient(ellipse at 50% 40%, rgba(255,229,0,0.12) 0%, rgba(0,0,0,0.5) 70%);
+  border: 1.5px dashed rgba(255, 229, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  pointer-events: none;
+}
+
+.template-thumb-custom-icon {
+  font-size: 1.4rem;
+  color: var(--neon-yellow);
+  line-height: 1;
+}
+
+.template-thumb-custom-text {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.42rem;
+  color: rgba(255, 229, 0, 0.75);
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* ─── Frame Builder ───────────────────────────────────────────────────────── */
+.frame-builder {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+.fb-row {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.fb-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.fb-section-label {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.5rem;
+  color: rgba(255, 255, 255, 0.65);
+  letter-spacing: 0.5px;
+}
+
+.fb-select-hint {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--neon-yellow);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* Border style pills */
+.fb-style-pills {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.fb-pill {
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.65);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.fb-pill:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: var(--white);
+}
+
+.fb-pill.active {
+  background: rgba(255, 229, 0, 0.15);
+  border-color: var(--neon-yellow);
+  color: var(--neon-yellow);
+}
+
+/* Color swatches */
+.fb-color-swatches {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.fb-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  background: var(--sw, #FFE500);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  flex-shrink: 0;
+}
+
+.fb-swatch:hover {
+  transform: scale(1.15);
+}
+
+.fb-swatch.active {
+  border-color: var(--white);
+  box-shadow: 0 0 0 2px var(--sw, #FFE500);
+  transform: scale(1.1);
+}
+
+/* ── Zone placement field ─────────────────────────────────────────────────── */
+.fb-placement {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.fb-zone-field {
+  position: relative;
+  width: 240px;
+  height: 240px;
+  margin: 26px auto 10px;
+  /* overflow visible so edge zones (tc, ml, mr) can protrude past the boundary */
+  overflow: visible;
+}
+
+.fb-photo-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 62%;
+  height: 62%;
+  border-radius: 50%;
+  background: rgba(22, 89, 50, 0.35);
+  border: 2px dashed rgba(255, 229, 0, 0.22);
+  pointer-events: none;
+}
+
+.fb-badge-indicator {
+  position: absolute;
+  bottom: 19%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.38rem;
+  color: rgba(255, 229, 0, 0.38);
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Wrapper div that anchors each zone button at the correct fractional position */
+.fb-zone-anchor {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+.fb-drop-zone {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px dashed rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.28);
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.fb-drop-zone:hover {
+  transform: scale(1.14);
+  border-color: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* When a sticker is selected in the palette, pulse zones to signal droppability */
+.fb-drop-zone.ready {
+  border-color: rgba(255, 229, 0, 0.5);
+  background: rgba(255, 229, 0, 0.06);
+  animation: zonePulse 1.2s ease-in-out infinite;
+}
+
+.fb-drop-zone.filled {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.08);
+  color: unset;
+}
+
+.fb-drop-zone.filled:hover {
+  border-color: rgba(255, 100, 100, 0.65);
+  background: rgba(255, 80, 80, 0.1);
+}
+
+@keyframes zonePulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 229, 0, 0); }
+  50%       { box-shadow: 0 0 0 5px rgba(255, 229, 0, 0.18); }
+}
+
+/* ── Sticker palette ──────────────────────────────────────────────────────── */
+.fb-palette {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.fb-palette-tabs {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.fb-tab {
+  padding: 0.3rem 0.7rem;
+  border-radius: 8px;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.55);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.fb-tab:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  color: var(--white);
+}
+
+.fb-tab.active {
+  background: rgba(255, 229, 0, 0.12);
+  border-color: var(--neon-yellow);
+  color: var(--neon-yellow);
+}
+
+.fb-sticker-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 0.35rem;
+}
+
+@media (max-width: 480px) {
+  .fb-sticker-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+.fb-sticker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  cursor: grab;
+  user-select: none;
+  transition: transform 0.13s ease, background 0.13s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.fb-sticker:hover {
+  transform: scale(1.18);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.fb-sticker:active {
+  cursor: grabbing;
+  transform: scale(0.95);
+}
+
+.fb-sticker.selected {
+  border-color: var(--neon-yellow);
+  background: rgba(255, 229, 0, 0.14);
+  box-shadow: 0 0 0 2px rgba(255, 229, 0, 0.35);
+  animation: selectedPop 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes selectedPop {
+  from { transform: scale(0.85); }
+  to   { transform: scale(1); }
+}
+
+.fb-hint {
+  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.38);
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* ─── Template groups ─────────────────────────────────────────────────────── */
+.template-group {
+  margin-top: 1.1rem;
+}
+
+.template-group:first-child {
+  margin-top: 0;
+}
+
+.template-group-label {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.44rem;
+  color: rgba(255, 255, 255, 0.35);
+  letter-spacing: 0.18em;
+  margin-bottom: 0.55rem;
+  padding-left: 2px;
+}
+
+/* Background swatch shows a gradient preview */
+.fb-swatch {
+  background: radial-gradient(ellipse at 40% 35%, var(--sw-glow, rgba(255,255,255,0.1)), var(--sw, #222));
+}
+
+/* ─── Placed stickers in zone field (free positioning) ───────────────────── */
+.fb-zone-field {
+  cursor: crosshair;
+}
+
+.fb-zone-field--placing {
+  outline: 1.5px dashed rgba(255, 229, 0, 0.55);
+  outline-offset: 2px;
+  animation: zonePulse 1.2s ease-in-out infinite;
+}
+
+.fb-placed-sticker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.12s ease;
+}
+
+.fb-placed-sticker:hover {
+  transform: translate(-50%, -50%) scale(1.2);
+  z-index: 2;
+}
+
+.fb-placed-remove {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 15px;
+  height: 15px;
+  background: rgba(220, 50, 50, 0.9);
+  border-radius: 50%;
+  font-size: 11px;
+  font-style: normal;
+  text-align: center;
+  line-height: 15px;
+  color: #fff;
+  font-weight: 700;
+  display: none;
+  pointer-events: none;
+}
+
+.fb-placed-sticker:hover .fb-placed-remove {
+  display: block;
+}
+
+/* ─── Mobile: stack fb-row sections ─────────────────────────────────────── */
+@media (max-width: 480px) {
+  .fb-row {
+    flex-direction: column;
+    gap: 1rem;
+  }
 }
