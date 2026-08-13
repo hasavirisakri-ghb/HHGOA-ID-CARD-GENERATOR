@@ -45,23 +45,96 @@ export default function ResultPage() {
         <img src={cardUrl} alt="Your Builder Pass" style={{ width: '100%', height: 'auto', display: 'block' }} />
       </div>
 
-      {/* Horizontal action buttons container */}
-      <div className="result-actions-row">
+      {/* Horizontal row of 3 distinct, high-contrast colored buttons */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justify-content: 'center',
+        alignItems: 'center',
+        gap: '1rem',
+        width: '100%',
+        maxWidth: '750px',
+        margin: '1.5rem auto 2.5rem auto',
+        padding: '0 1rem'
+      }}>
+        {/* Button 1: Dark Forest Green */}
         <button 
-          className="btn result-btn-download" 
           onClick={handleDownload}
+          style={{
+            flex: '1 1 200px',
+            maxWidth: '230px',
+            height: '48px',
+            backgroundColor: '#165932',
+            color: '#FFFFFF',
+            border: '2px solid #165932',
+            borderRadius: '12px',
+            fontWeight: '700',
+            fontSize: '0.85rem',
+            fontFamily: "'Space Mono', monospace",
+            cursor: 'pointer',
+            boxShadow: '0 4px 14px rgba(22, 89, 50, 0.4)',
+            whiteSpace: 'nowrap',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justify-content: 'center',
+            gap: '0.5rem',
+            transition: 'transform 0.15s ease'
+          }}
         >
           ⬇ Download Pass
         </button>
+
+        {/* Button 2: Solid Black */}
         <button 
-          className="btn result-btn-share" 
           onClick={handleShare}
+          style={{
+            flex: '1 1 200px',
+            maxWidth: '230px',
+            height: '48px',
+            backgroundColor: '#000000',
+            color: '#FFFFFF',
+            border: '2px solid #000000',
+            borderRadius: '12px',
+            fontWeight: '700',
+            fontSize: '0.85rem',
+            fontFamily: "'Space Mono', monospace",
+            cursor: 'pointer',
+            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.3)',
+            whiteSpace: 'nowrap',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justify-content: 'center',
+            gap: '0.5rem',
+            transition: 'transform 0.15s ease'
+          }}
         >
           ✕ Share to X
         </button>
+
+        {/* Button 3: Neon Yellow */}
         <button 
-          className="btn result-btn-another" 
           onClick={() => router.push('/')}
+          style={{
+            flex: '1 1 200px',
+            maxWidth: '230px',
+            height: '48px',
+            backgroundColor: '#FFE500',
+            color: '#000000',
+            border: '2px solid #B3A000',
+            borderRadius: '12px',
+            fontWeight: '700',
+            fontSize: '0.85rem',
+            fontFamily: "'Space Mono', monospace",
+            cursor: 'pointer',
+            boxShadow: '0 4px 14px rgba(255, 229, 0, 0.5)',
+            whiteSpace: 'nowrap',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justify-content: 'center',
+            gap: '0.5rem',
+            transition: 'transform 0.15s ease'
+          }}
         >
           ↻ Generate Another
         </button>

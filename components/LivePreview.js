@@ -58,46 +58,50 @@ export default function LivePreview({
           pointerEvents: 'none'
         }}>
           {/* Name Box: Right side of Name label */}
-          <div style={{
-            position: 'absolute',
-            top: '60.6%',
-            left: '42%',
-            width: '42%',
-            height: '4.5%',
-            display: 'flex',
-            alignItems: 'center',
-            color: '#FFFFFF',
-            fontFamily: '"Space Mono", monospace',
-            fontWeight: 'bold',
-            fontSize: 'clamp(0.55rem, 2cqw, 0.95rem)',
-            textTransform: 'uppercase',
-            letterSpacing: '1px',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden'
-          }}>
-            {name || 'YOUR NAME'}
-          </div>
+          {name && (
+            <div style={{
+              position: 'absolute',
+              top: '60.8%',
+              left: '42%',
+              width: '42%',
+              height: '4.5%',
+              display: 'flex',
+              alignItems: 'center',
+              color: '#FFFFFF',
+              fontFamily: '"Space Mono", monospace',
+              fontWeight: 'bold',
+              fontSize: 'clamp(0.55rem, 1.9cqw, 0.95rem)',
+              textTransform: 'uppercase',
+              letterSpacing: '1px',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden'
+            }}>
+              {name}
+            </div>
+          )}
 
           {/* Skill Box: Right side of Skill label */}
-          <div style={{
-            position: 'absolute',
-            top: '70.2%',
-            left: '40%',
-            width: '44%',
-            height: '4.5%',
-            display: 'flex',
-            alignItems: 'center',
-            color: '#FFFFFF',
-            fontFamily: '"Space Mono", monospace',
-            fontWeight: 'bold',
-            fontSize: 'clamp(0.5rem, 1.8cqw, 0.85rem)',
-            textTransform: 'uppercase',
-            letterSpacing: '1px',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden'
-          }}>
-            {skill || 'YOUR SKILL'}
-          </div>
+          {skill && (
+            <div style={{
+              position: 'absolute',
+              top: '70.4%',
+              left: '39%',
+              width: '44%',
+              height: '4.5%',
+              display: 'flex',
+              alignItems: 'center',
+              color: '#FFFFFF',
+              fontFamily: '"Space Mono", monospace',
+              fontWeight: 'bold',
+              fontSize: 'clamp(0.5rem, 1.7cqw, 0.85rem)',
+              textTransform: 'uppercase',
+              letterSpacing: '1px',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden'
+            }}>
+              {skill}
+            </div>
+          )}
         </div>
       </div>
     </div>
