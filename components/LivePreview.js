@@ -113,15 +113,20 @@ export default function LivePreview({
             </>
           ) : (
             <>
-              {/* PFP Frame: Branding & Name overlay at bottom */}
+              {/* PFP Frame: High-Contrast Badges for Branding & User Info */}
               <div style={{
                 position: 'absolute',
-                bottom: '5%',
-                left: '6%',
+                bottom: '4%',
+                left: '4%',
+                background: 'rgba(0, 0, 0, 0.82)',
+                border: '1.5px solid #FFE500',
+                borderRadius: '8px',
+                padding: '4px 10px',
                 color: '#FFE500',
                 fontFamily: '"Playfair Display", serif',
                 fontWeight: 900,
-                fontSize: 'clamp(0.7rem, 2.5cqw, 1.1rem)'
+                fontSize: 'clamp(0.7rem, 2.3cqw, 1.1rem)',
+                boxShadow: '0 4px 15px rgba(0, 0, 0, 0.7)'
               }}>
                 HH GOA '26
               </div>
@@ -129,16 +134,44 @@ export default function LivePreview({
               {(name || handle) && (
                 <div style={{
                   position: 'absolute',
-                  bottom: '4.5%',
-                  right: '6%',
+                  bottom: '4%',
+                  right: '4%',
+                  background: 'rgba(0, 0, 0, 0.85)',
+                  border: '1.5px solid #FFE500',
+                  borderRadius: '8px',
+                  padding: '4px 12px',
                   textAlign: 'right',
                   color: '#FFFFFF',
                   fontFamily: '"Space Mono", monospace',
                   fontWeight: 700,
-                  fontSize: 'clamp(0.55rem, 1.8cqw, 0.85rem)'
+                  boxShadow: '0 4px 15px rgba(0, 0, 0, 0.7)',
+                  maxWidth: '55%',
+                  overflow: 'hidden'
                 }}>
-                  {name && <div>{name.toUpperCase()}</div>}
-                  {handle && <div style={{ opacity: 0.8, fontSize: '0.8em' }}>{handle.startsWith('@') ? handle : `@${handle}`}</div>}
+                  {name && (
+                    <div style={{ 
+                      color: '#FFE500', 
+                      fontSize: 'clamp(0.65rem, 2.2cqw, 1rem)', 
+                      fontWeight: 800,
+                      whiteSpace: 'nowrap',
+                      textOverflow: 'ellipsis',
+                      overflow: 'hidden'
+                    }}>
+                      {name.toUpperCase()}
+                    </div>
+                  )}
+                  {handle && (
+                    <div style={{ 
+                      color: '#FFFFFF', 
+                      fontSize: 'clamp(0.55rem, 1.8cqw, 0.85rem)', 
+                      opacity: 0.9,
+                      whiteSpace: 'nowrap',
+                      textOverflow: 'ellipsis',
+                      overflow: 'hidden'
+                    }}>
+                      {handle.startsWith('@') ? handle : `@${handle}`}
+                    </div>
+                  )}
                 </div>
               )}
             </>
