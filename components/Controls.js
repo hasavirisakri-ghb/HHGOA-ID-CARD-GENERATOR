@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react';
 
 export default function Controls({ 
+  activeFormat = 'ID_CARD',
   onImageUpload, 
   zoom, 
   onZoomChange,
@@ -12,6 +13,8 @@ export default function Controls({
   onSkillChange,
   title,
   onTitleChange,
+  handle,
+  onHandleChange,
   onGenerate 
 }) {
   const fileInputRef = useRef(null);
@@ -36,11 +39,17 @@ export default function Controls({
     setIsGenerating(false);
   };
 
+  const isPfp = activeFormat === 'PFP_FRAME';
+
   return (
     <div className="controls-panel animate-fade-in">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '0.75rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-        <h2 className="section-title" style={{ margin: 0 }}>📷 EDITABLE CARD CONTROLS</h2>
-        <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', fontFamily: 'Space Mono' }}>2048×2048 FINAL ID</span>
+        <h2 className="section-title" style={{ margin: 0 }}>
+          {isPfp ? '📷 EDITABLE PFP CONTROLS' : '📷 EDITABLE CARD CONTROLS'}
+        </h2>
+        <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', fontFamily: 'Space Mono' }}>
+          {isPfp ? '1080×1080 FINAL PFP' : '2048×2048 FINAL ID'}
+        </span>
       </div>
       
       <div className="control-group">
@@ -90,38 +99,56 @@ export default function Controls({
             placeholder="Enter your name" 
             value={name} 
             onChange={(e) => onNameChange(e.target.value)} 
-            maxLength={15}
-          />
-        </div>
-      </div>
-
-      <div className="control-group">
-        <label className="control-label">🔑 SKILL / STACK</label>
-        <div className="input-with-icon">
-          <span className="input-icon">🔑</span>
-          <input 
-            type="text" 
-            placeholder="Enter your skill / stack" 
-            value={skill} 
-            onChange={(e) => onSkillChange(e.target.value)} 
             maxLength={20}
           />
         </div>
       </div>
 
-      <div className="control-group" style={{ borderBottom: 'none' }}>
-        <label className="control-label">🎗️ BUILDER TITLE</label>
-        <div className="input-with-icon">
-          <span className="input-icon">🎗️</span>
-          <input 
-            type="text" 
-            placeholder="Enter builder title" 
-            value={title} 
-            onChange={(e) => onTitleChange(e.target.value)} 
-            maxLength={20}
-          />
+      {isPfp ? (
+        <div className="control-group" style={{ borderBottom: 'none' }}>
+          <label className="control-label">🌐 SOCIAL HANDLE</label>
+          <div className="input-with-icon">
+            <span className="input-icon">@</span>
+            <input 
+              type="text" 
+              placeholder="e.g. twitter_handle" 
+              value={handle} 
+              onChange={(e) => onHandleChange(e.target.value)} 
+              maxLength={20}
+            />
+          </div>
         </div>
-      </div>
+      ) : (
+        <>
+          <div className="control-group">
+            <label className="control-label">🔑 SKILL / STACK</label>
+            <div className="input-with-icon">
+              <span className="input-icon">🔑</span>
+              <input 
+                type="text" 
+                placeholder="Enter your skill / stack" 
+                value={skill} 
+                onChange={(e) => onSkillChange(e.target.value)} 
+                maxLength={20}
+              />
+            </div>
+          </div>
+
+          <div className="control-group" style={{ borderBottom: 'none' }}>
+            <label className="control-label">🎗️ BUILDER TITLE</label>
+            <div className="input-with-icon">
+              <span className="input-icon">🎗️</span>
+              <input 
+                type="text" 
+                placeholder="Enter builder title" 
+                value={title} 
+                onChange={(e) => onTitleChange(e.target.value)} 
+                maxLength={20}
+              />
+            </div>
+          </div>
+        </>
+      )}
 
       <button 
         className="btn btn-primary btn-block btn-generate" 
@@ -129,7 +156,7 @@ export default function Controls({
         disabled={isGenerating}
         style={{ marginTop: '1.5rem', minHeight: '54px', fontSize: '1rem' }}
       >
-        <span className="lightning-icon">⚡</span> {isGenerating ? 'GENERATING PASS...' : 'GENERATE PASS'}
+        <span className="lightning-icon">⚡</span> {isGenerating ? 'GENERATING...' : isPfp ? 'GENERATE PFP' : 'GENERATE PASS'}
       </button>
     </div>
   );

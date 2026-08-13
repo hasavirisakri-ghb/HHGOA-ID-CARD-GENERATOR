@@ -6,28 +6,37 @@ import { useRouter } from 'next/navigation';
 export default function ResultPage() {
   const router = useRouter();
   const [cardUrl, setCardUrl] = useState(null);
+  const [formatType, setFormatType] = useState('ID_CARD');
 
   useEffect(() => {
     const dataUrl = sessionStorage.getItem('hhgoa_generated_card');
+    const type = sessionStorage.getItem('hhgoa_format_type') || 'ID_CARD';
     if (dataUrl) {
       setCardUrl(dataUrl);
+      setFormatType(type);
     } else {
       router.push('/');
     }
   }, [router]);
 
+  const isPfp = formatType === 'PFP_FRAME';
+
   const handleDownload = () => {
     if (!cardUrl) return;
     const link = document.createElement('a');
     link.href = cardUrl;
-    link.download = 'hhgoa-builder-pass.png';
+    link.download = isPfp ? 'hhgoa-pfp-frame.png' : 'hhgoa-builder-pass.png';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
   const handleShare = () => {
-    const text = encodeURIComponent("Just got my HH Goa 2026 Builder Pass! 🏖️🚀 Check out the generator 👇");
+    const text = encodeURIComponent(
+      isPfp 
+        ? "Just customized my HH Goa 2026 Profile Picture Frame! 🏖️🚀 Frame yours 👇" 
+        : "Just got my HH Goa 2026 Builder Pass! 🏖️🚀 Get yours 👇"
+    );
     const hashtags = "FrameInGoa,HHGoa2026";
     const intentUrl = `https://twitter.com/intent/tweet?text=${text}&hashtags=${hashtags}`;
     window.open(intentUrl, '_blank');
@@ -38,11 +47,14 @@ export default function ResultPage() {
   return (
     <div className="result-page">
       <div className="success-badge">
-        ✓ Your Builder Pass is Ready
+        ✓ {isPfp ? 'Your PFP Profile Frame is Ready' : 'Your Builder Pass is Ready'}
       </div>
       
-      <div className="result-card-container">
-        <img src={cardUrl} alt="Your Builder Pass" style={{ width: '100%', height: 'auto', display: 'block' }} />
+      <div 
+        className="result-card-container" 
+        style={{ maxWidth: isPfp ? '450px' : '420px', aspectRatio: isPfp ? '1/1' : '9/16' }}
+      >
+        <img src={cardUrl} alt="Your Generated Graphic" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
       </div>
 
       {/* Horizontal row of 3 distinct, high-contrast colored buttons */}
@@ -82,7 +94,7 @@ export default function ResultPage() {
             transition: 'transform 0.15s ease'
           }}
         >
-          ⬇ Download Pass
+          ⬇ {isPfp ? 'Download PFP' : 'Download Pass'}
         </button>
 
         {/* Button 2: Solid Black */}
@@ -104,7 +116,7 @@ export default function ResultPage() {
             whiteSpace: 'nowrap',
             display: 'inline-flex',
             alignItems: 'center',
-            justifyContent: 'center',
+            justify-content: 'center',
             gap: '0.5rem',
             transition: 'transform 0.15s ease'
           }}
@@ -131,7 +143,7 @@ export default function ResultPage() {
             whiteSpace: 'nowrap',
             display: 'inline-flex',
             alignItems: 'center',
-            justifyContent: 'center',
+            justify-content: 'center',
             gap: '0.5rem',
             transition: 'transform 0.15s ease'
           }}
