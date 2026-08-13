@@ -21,6 +21,7 @@ export default function Home() {
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
 
   const [name, setName] = useState('');
+  const [duotone, setDuotone] = useState(false);
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState(null);
@@ -52,6 +53,7 @@ export default function Home() {
         templateSrc: selectedTemplate.src,
         photoRadius: selectedTemplate.photoRadius,
         name,
+        duotone,
       });
       const cardDataUrl = canvas.toDataURL('image/png');
 
@@ -86,6 +88,9 @@ export default function Home() {
           onGenerate={handleGenerate}
           isGenerating={isGenerating}
           error={error}
+          onCropChange={setCrop}
+          duotone={duotone}
+          onDuotoneChange={setDuotone}
         />
 
         <LivePreview
@@ -97,6 +102,7 @@ export default function Home() {
           onCropChange={setCrop}
           onCropComplete={onCropComplete}
           name={name}
+          duotone={duotone}
         />
       </div>
 

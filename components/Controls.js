@@ -11,17 +11,20 @@ export default function Controls({
   onGenerate,
   isGenerating,
   error,
+  onCropChange,
+  duotone,
+  onDuotoneChange,
 }) {
   const fileInputRef = useRef(null);
+  const prevImageRef = useRef(null);
   const [isConverting, setIsConverting] = useState(false);
   const [uploadError, setUploadError] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
 
-  const handleFileChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  const handleFile = async (file) => {
     setUploadError(null);
-
     try {
+      let objectUrl;
       const isHeic = file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic');
 
       if (isHeic) {
@@ -29,20 +32,57 @@ export default function Controls({
         const heic2any = (await import('heic2any')).default;
         const converted = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.85 });
         const blob = Array.isArray(converted) ? converted[0] : converted;
-        onImageUpload(URL.createObjectURL(blob));
+        objectUrl = URL.createObjectURL(blob);
       } else if (file.type.startsWith('image/')) {
-        onImageUpload(URL.createObjectURL(file));
+        objectUrl = URL.createObjectURL(file);
       } else {
         setUploadError('Please choose an image file (JPG, PNG, WEBP or HEIC).');
+        return;
+      }
+
+      // Memory leak fix: revoke the previous object URL before storing the new one
+      if (prevImageRef.current) URL.revokeObjectURL(prevImageRef.current);
+      prevImageRef.current = objectUrl;
+
+      onImageUpload(objectUrl);
+
+      // Auto face-center using Shape Detection API (Chrome/Android only)
+      if (typeof window !== 'undefined' && 'FaceDetector' in window) {
+        try {
+          const img = new Image();
+          img.src = objectUrl;
+          await img.decode();
+          const detector = new window.FaceDetector({ fastMode: true });
+          const faces = await detector.detect(img);
+          if (faces.length > 0) {
+            const face = faces[0].boundingBox;
+            const cx = (face.x + face.width / 2) / img.naturalWidth;
+            const cy = (face.y + face.height / 2) / img.naturalHeight;
+            // react-easy-crop uses {x, y} where 0 = centered, values shift the image
+            const newCrop = {
+              x: (0.5 - cx) * 100,
+              y: (0.5 - cy) * 100,
+            };
+            onCropChange(newCrop);
+          }
+        } catch {
+          // Silently fall back — FaceDetector may not be available
+        }
       }
     } catch (err) {
       console.error(err);
       setUploadError('Could not read that photo. Try a different file.');
     } finally {
       setIsConverting(false);
-      // allow re-selecting the same file
-      e.target.value = '';
     }
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    await handleFile(file);
+    // allow re-selecting the same file
+    e.target.value = '';
   };
 
   return (
@@ -65,14 +105,19 @@ export default function Controls({
           className="hidden"
         />
         <div
-          className="upload-dropzone"
+          className={`upload-dropzone${isDragging ? ' drag-active' : ''}`}
           role="button"
           tabIndex={0}
           onClick={() => fileInputRef.current.click()}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') fileInputRef.current.click(); }}
+          onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setIsDragging(true); }}
+          onDragLeave={(e) => { e.stopPropagation(); setIsDragging(false); }}
+          onDrop={(e) => { e.preventDefault(); e.stopPropagation(); setIsDragging(false); const file = e.dataTransfer.files[0]; if (file) handleFile(file); }}
         >
           <span className="upload-icon">{isConverting ? '⏳' : '↑'}</span>
-          <span className="upload-text">{isConverting ? 'Converting HEIC…' : 'Upload Photo'}</span>
+          <span className="upload-text">
+            {isConverting ? 'Converting HEIC…' : isDragging ? 'Drop it!' : 'Upload Photo'}
+          </span>
         </div>
         <div className="control-hint">Supports JPG, PNG, WEBP &amp; HEIC (iPhone)</div>
         {uploadError && <div className="control-error" role="alert">{uploadError}</div>}
@@ -95,6 +140,17 @@ export default function Controls({
           />
         </div>
         <span className="tip-text">💡 Tip: Drag directly on the photo to reposition. Pinch or scroll to zoom!</span>
+
+        <div className="duotone-toggle-row">
+          <span className="section-label">PHOTO FILTER</span>
+          <button
+            className={`duotone-btn${duotone ? ' duotone-btn--active' : ''}`}
+            onClick={() => onDuotoneChange(!duotone)}
+            type="button"
+          >
+            {duotone ? '⬛ HH GLOW ON' : '⬜ HH GLOW OFF'}
+          </button>
+        </div>
       </div>
 
       <div className="control-group" style={{ borderBottom: 'none' }}>
