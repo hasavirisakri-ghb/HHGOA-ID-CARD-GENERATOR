@@ -77,7 +77,7 @@ export default function ResultPage() {
             whiteSpace: 'nowrap',
             display: 'inline-flex',
             alignItems: 'center',
-            justify-content: 'center',
+            justifyContent: 'center',
             gap: '0.5rem',
             transition: 'transform 0.15s ease'
           }}
@@ -104,7 +104,7 @@ export default function ResultPage() {
             whiteSpace: 'nowrap',
             display: 'inline-flex',
             alignItems: 'center',
-            justify-content: 'center',
+            justifyContent: 'center',
             gap: '0.5rem',
             transition: 'transform 0.15s ease'
           }}
@@ -131,7 +131,7 @@ export default function ResultPage() {
             whiteSpace: 'nowrap',
             display: 'inline-flex',
             alignItems: 'center',
-            justify-content: 'center',
+            justifyContent: 'center',
             gap: '0.5rem',
             transition: 'transform 0.15s ease'
           }}
