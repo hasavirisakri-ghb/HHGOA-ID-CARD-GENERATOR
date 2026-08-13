@@ -38,8 +38,8 @@ export default function Controls({
 
   return (
     <div className="controls-panel animate-fade-in">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-        <h2 className="section-title">📷 EDITABLE CARD CONTROLS</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '0.75rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+        <h2 className="section-title" style={{ margin: 0 }}>📷 EDITABLE CARD CONTROLS</h2>
         <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', fontFamily: 'Space Mono' }}>2048×2048 FINAL ID</span>
       </div>
       
@@ -52,9 +52,13 @@ export default function Controls({
           accept="image/png, image/jpeg, image/webp, image/heic, .heic" 
           className="hidden" 
         />
-        <button className="btn btn-primary btn-block" onClick={() => fileInputRef.current.click()}>
-          ↑ Upload Photo
-        </button>
+        <div 
+          className="upload-dropzone" 
+          onClick={() => fileInputRef.current.click()}
+        >
+          <span className="upload-icon">↑</span>
+          <span className="upload-text">Upload Photo</span>
+        </div>
         
         <div style={{ marginTop: '1rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'rgba(255,255,255,0.7)', marginBottom: '0.3rem' }}>
@@ -102,7 +106,7 @@ export default function Controls({
         </div>
       </div>
 
-      <div className="control-group">
+      <div className="control-group" style={{ borderBottom: 'none' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <label className="control-label">🎗️ BUILDER TITLE</label>
           <span style={{ fontSize: '0.65rem', color: 'var(--neon-yellow)', cursor: 'pointer' }}>✨ Generate with AI</span>
@@ -120,12 +124,12 @@ export default function Controls({
       </div>
 
       <button 
-        className="btn btn-primary btn-block" 
+        className="btn btn-primary btn-block btn-generate" 
         onClick={handleGenerateClick}
         disabled={isGenerating}
         style={{ marginTop: '1.5rem', minHeight: '54px', fontSize: '1rem' }}
       >
-        {isGenerating ? 'GENERATING PASS...' : '⚡ GENERATE PASS'}
+        <span className="lightning-icon">⚡</span> {isGenerating ? 'GENERATING PASS...' : 'GENERATE PASS'}
       </button>
     </div>
   );

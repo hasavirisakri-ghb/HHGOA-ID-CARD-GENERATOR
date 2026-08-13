@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef } from 'react';
 import Cropper from 'react-easy-crop';
 
 export default function LivePreview({ 
@@ -14,9 +13,6 @@ export default function LivePreview({
   skill,
   title
 }) {
-  // We don't render the full 1080x1920 canvas here for performance,
-  // we just use CSS and absolute positioning to create a WYSIWYG preview!
-
   return (
     <div className="preview-panel animate-fade-in" style={{ animationDelay: '0.2s' }}>
       <div className="canvas-wrapper">
@@ -26,7 +22,7 @@ export default function LivePreview({
               image={userImage}
               crop={crop}
               zoom={zoom}
-              aspect={1} // The hole is a circle, so the cropper aspect is 1:1
+              aspect={1}
               cropShape="round"
               restrictPosition={false}
               showGrid={false}
@@ -34,19 +30,14 @@ export default function LivePreview({
               onZoomChange={onZoomChange}
               onCropComplete={onCropComplete}
               style={{
-                containerStyle: { 
-                  background: '#165932',
-                  // We need to offset the cropper so it aligns with the hole in the template.
-                  // The hole in our 1080x1920 template is around cy=680. 680/1920 = 35.4% down from the top.
-                  // The radius is 380, so diameter 760. 760/1080 = 70.3% of width.
-                },
+                containerStyle: { background: '#165932' },
                 cropAreaStyle: { border: 'none', boxShadow: 'none' }
               }}
             />
           </div>
         ) : (
           <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#165932' }}>
-            {/* Blank background */}
+            {/* Blank background until image uploaded */}
           </div>
         )}
 
@@ -60,49 +51,53 @@ export default function LivePreview({
           pointerEvents: 'none'
         }} />
 
-        {/* Dynamic Text Overlay */}
+        {/* Dynamic Text Overlay - Scaled & Positioned strictly inside the neon boxes */}
         <div style={{
           position: 'absolute',
           top: 0, left: 0, right: 0, bottom: 0,
-          pointerEvents: 'none',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center'
+          pointerEvents: 'none'
         }}>
-          {/* Name Box: Around 60.5% down based on template */}
+          {/* Name Box: Placed to the right of the "Name" label */}
           <div style={{
             position: 'absolute',
-            top: '60.5%',
-            width: '100%',
-            textAlign: 'center',
-            color: 'white',
+            top: '60.6%',
+            left: '36%',
+            width: '48%',
+            height: '4.5%',
+            display: 'flex',
+            alignItems: 'center',
+            color: '#FFFFFF',
             fontFamily: '"Space Mono", monospace',
             fontWeight: 'bold',
-            fontSize: 'clamp(1rem, 4cqw, 2rem)',
+            fontSize: 'clamp(0.6rem, 2.3cqw, 1.05rem)',
             textTransform: 'uppercase',
-            textShadow: '0px 2px 10px rgba(255, 255, 255, 0.3)'
+            letterSpacing: '1px',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden'
           }}>
             {name || 'YOUR NAME'}
           </div>
 
-          {/* Skill Box: Around 70% down */}
+          {/* Skill Box: Placed to the right of the "Skill" label */}
           <div style={{
             position: 'absolute',
-            top: '70%',
-            width: '100%',
-            textAlign: 'center',
-            color: 'white',
+            top: '70.2%',
+            left: '34%',
+            width: '50%',
+            height: '4.5%',
+            display: 'flex',
+            alignItems: 'center',
+            color: '#FFFFFF',
             fontFamily: '"Space Mono", monospace',
             fontWeight: 'bold',
-            fontSize: 'clamp(0.9rem, 3.5cqw, 1.8rem)',
+            fontSize: 'clamp(0.55rem, 2.1cqw, 0.95rem)',
             textTransform: 'uppercase',
-            textShadow: '0px 2px 10px rgba(255, 255, 255, 0.3)'
+            letterSpacing: '1px',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden'
           }}>
             {skill || 'YOUR SKILL'}
           </div>
-
-          {/* Builder Title (if we use the left column in the template) */}
-          {/* Let's put it somewhere near the bottom left or we can omit it in live preview if it's too complex */}
         </div>
       </div>
     </div>

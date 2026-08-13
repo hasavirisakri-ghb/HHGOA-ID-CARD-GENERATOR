@@ -97,6 +97,12 @@ h2, .section-title {
   100% { box-shadow: 0 0 5px rgba(255, 229, 0, 0.2); }
 }
 
+@keyframes lightningWiggle {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(-15deg) scale(1.2); }
+  75% { transform: rotate(15deg) scale(1.2); }
+}
+
 .animate-fade-in {
   animation: fadeIn 0.4s ease-out forwards;
 }
@@ -145,6 +151,8 @@ h2, .section-title {
 /* Controls & Inputs */
 .control-group {
   margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .control-label {
@@ -154,6 +162,40 @@ h2, .section-title {
   color: rgba(255, 255, 255, 0.65);
   margin-bottom: 0.6rem;
   letter-spacing: 0.5px;
+}
+
+/* Dashed Upload Dropzone */
+.upload-dropzone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  background: rgba(255, 229, 0, 0.08);
+  border: 2px dashed var(--neon-yellow);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  color: var(--neon-yellow);
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.upload-dropzone:hover {
+  background: var(--neon-yellow);
+  color: var(--black);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 229, 0, 0.35);
+}
+
+.upload-dropzone:active {
+  transform: translateY(1px);
+}
+
+.upload-icon {
+  font-size: 1.1rem;
+  font-weight: bold;
 }
 
 .input-with-icon {
@@ -180,12 +222,14 @@ input[type="text"] {
   padding: 0.85rem 1rem 0.85rem 2.8rem;
   border-radius: 10px;
   outline: none;
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 input[type="text"]:focus {
   border-color: var(--neon-yellow);
-  box-shadow: 0 0 10px rgba(255, 229, 0, 0.2);
+  border-left: 4px solid var(--neon-yellow);
+  box-shadow: 0 0 15px rgba(255, 229, 0, 0.25);
+  background: rgba(0, 0, 0, 0.6);
 }
 
 /* Zoom Slider */
@@ -195,9 +239,10 @@ input[type="text"]:focus {
   accent-color: var(--neon-yellow);
   height: 6px;
   border-radius: 3px;
+  cursor: pointer;
 }
 
-/* Buttons */
+/* Buttons & Micro-interactions */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -211,7 +256,7 @@ input[type="text"]:focus {
   border-radius: 12px;
   cursor: pointer;
   border: 2px solid transparent;
-  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   width: 100%;
@@ -225,14 +270,19 @@ input[type="text"]:focus {
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 0 #B3A000, 0 15px 25px rgba(255, 229, 0, 0.4);
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 7px 0 #B3A000, 0 15px 30px rgba(255, 229, 0, 0.45);
   animation: pulseGlow 2s infinite;
 }
 
+.btn-primary:hover .lightning-icon {
+  display: inline-block;
+  animation: lightningWiggle 0.4s ease-in-out infinite;
+}
+
 .btn-primary:active {
-  transform: translateY(3px);
-  box-shadow: 0 1px 0 #B3A000, 0 5px 10px rgba(0,0,0,0.3);
+  transform: translateY(2px) scale(0.99);
+  box-shadow: 0 2px 0 #B3A000, 0 5px 10px rgba(0,0,0,0.3);
 }
 
 .btn-dark {
@@ -246,8 +296,13 @@ input[type="text"]:focus {
   background: #111;
   border-color: var(--neon-yellow);
   color: var(--neon-yellow);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 0 rgba(255, 229, 0, 0.2), 0 15px 25px rgba(0,0,0,0.4);
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 7px 0 rgba(255, 229, 0, 0.25), 0 15px 30px rgba(0,0,0,0.45);
+}
+
+.btn-dark:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .btn-block {
@@ -277,7 +332,7 @@ input[type="text"]:focus {
   background: #0d2817;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+  box-shadow: 0 20px 45px rgba(0,0,0,0.65);
   border: 1px solid rgba(255,255,255,0.15);
 }
 
@@ -310,7 +365,7 @@ input[type="text"]:focus {
   display: none !important;
 }
 
-/* Collision-Proof Floating Stickers */
+/* Collision-Proof Floating Stickers (Larger 170px width) */
 .stickers-container {
   position: absolute;
   top: 0;
@@ -325,19 +380,19 @@ input[type="text"]:focus {
   display: none;
 }
 
-/* Only display stickers when viewport is wide enough (>= 1560px) so they stay safely in the outer margins */
-@media (min-width: 1560px) {
+/* Display stickers when viewport width >= 1580px so they stay in safe outer margins */
+@media (min-width: 1580px) {
   .floating-sticker {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     position: fixed;
-    width: 140px;
-    padding: 12px 10px;
+    width: 170px;
+    padding: 16px 12px;
     background: #FFFFFF;
-    border-radius: 16px;
-    box-shadow: 0 18px 35px rgba(0,0,0,0.45);
+    border-radius: 18px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.45);
     pointer-events: auto;
     color: var(--black);
     text-align: center;
@@ -346,51 +401,52 @@ input[type="text"]:focus {
   }
 
   .floating-sticker:hover {
-    transform: scale(1.1) rotate(0deg) !important;
+    transform: scale(1.12) rotate(0deg) !important;
     z-index: 10;
   }
 
-  .sticker-badge-icon, .sticker-emoji {
-    font-size: 2rem;
-    margin-bottom: 0.2rem;
+  .sticker-emoji {
+    font-size: 2.6rem;
+    line-height: 1;
+    margin-bottom: 0.4rem;
   }
 
   .sticker-title {
     font-family: 'Space Mono', monospace;
     font-weight: 800;
-    font-size: 0.65rem;
-    line-height: 1.1;
+    font-size: 0.75rem;
+    line-height: 1.15;
     color: #111827;
   }
 
   .sticker-sub {
-    font-size: 0.55rem;
+    font-size: 0.6rem;
     color: #6B7280;
-    margin-top: 2px;
+    margin-top: 3px;
     font-weight: 600;
   }
 
   .sticker-1 {
     top: 140px;
-    left: calc(50vw - 640px - 160px);
+    left: calc(50vw - 640px - 190px);
     animation: float1 6s ease-in-out infinite;
   }
 
   .sticker-2 {
     top: 180px;
-    right: calc(50vw - 640px - 160px);
+    right: calc(50vw - 640px - 190px);
     animation: float2 7s ease-in-out infinite;
   }
 
   .sticker-3 {
     bottom: 120px;
-    left: calc(50vw - 640px - 160px);
+    left: calc(50vw - 640px - 190px);
     animation: float3 6.5s ease-in-out infinite;
   }
 
   .sticker-4 {
     bottom: 140px;
-    right: calc(50vw - 640px - 160px);
+    right: calc(50vw - 640px - 190px);
     animation: float4 8s ease-in-out infinite;
   }
 }
