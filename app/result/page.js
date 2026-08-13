@@ -79,6 +79,10 @@ export default function ResultPage() {
     setDownloaded(true);
   };
 
+  // Caption, link, and hashtags are folded into one `text` string rather than
+  // split across text/url/hashtags: when X's native app is installed its own
+  // deep-link handler only reads `text` and silently drops the rest, so `text`
+  // is the one thing that reliably survives the handoff either way.
   const openTweetIntent = () => {
     const text = `${SHARE_TEXT} ${SITE_URL} ${HASHTAG_TEXT}`;
     window.open(
@@ -88,8 +92,11 @@ export default function ResultPage() {
     );
   };
 
-  // Feature-detect file-sharing (mainly mobile Safari/Chrome) before trying it.
-  // Falls back to download + tweet composer on desktop where file share is flaky.
+  // Feature-detect actual OS share-sheet support for files before trying it.
+  // Where it's genuinely usable (mainly mobile Safari/Chrome), the image +
+  // caption land already attached in X once the user picks it from the list.
+  // Desktop canShare is inconsistent, so this falls through to the blob/tweet
+  // path below — same reliable behavior desktop has always had.
   const handleShare = async () => {
     if (!cardUrl || isSharing) return;
     setIsSharing(true);
@@ -113,6 +120,7 @@ export default function ResultPage() {
       }
     } catch (err) {
       if (err?.name === 'AbortError') {
+        // User cancelled the share sheet — not an error worth surfacing.
         setIsSharing(false);
         return;
       }
