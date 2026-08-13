@@ -59,6 +59,9 @@ export default function Controls({
           <span className="upload-icon">↑</span>
           <span className="upload-text">Upload Photo</span>
         </div>
+        <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)', textAlign: 'center', marginTop: '0.4rem' }}>
+          Supports JPG, PNG, WEBP & HEIC (iPhone)
+        </div>
         
         <div style={{ marginTop: '1rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'rgba(255,255,255,0.7)', marginBottom: '0.3rem' }}>
@@ -107,10 +110,7 @@ export default function Controls({
       </div>
 
       <div className="control-group" style={{ borderBottom: 'none' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <label className="control-label">🎗️ BUILDER TITLE</label>
-          <span style={{ fontSize: '0.65rem', color: 'var(--neon-yellow)', cursor: 'pointer' }}>✨ Generate with AI</span>
-        </div>
+        <label className="control-label">🎗️ BUILDER TITLE</label>
         <div className="input-with-icon">
           <span className="input-icon">🎗️</span>
           <input 

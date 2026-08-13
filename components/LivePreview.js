@@ -51,25 +51,25 @@ export default function LivePreview({
           pointerEvents: 'none'
         }} />
 
-        {/* Dynamic Text Overlay - Scaled & Positioned strictly inside the neon boxes */}
+        {/* Dynamic Text Overlay - Positioned to the right of the printed labels */}
         <div style={{
           position: 'absolute',
           top: 0, left: 0, right: 0, bottom: 0,
           pointerEvents: 'none'
         }}>
-          {/* Name Box: Placed to the right of the "Name" label */}
+          {/* Name Box: Right side of Name label */}
           <div style={{
             position: 'absolute',
             top: '60.6%',
-            left: '36%',
-            width: '48%',
+            left: '42%',
+            width: '42%',
             height: '4.5%',
             display: 'flex',
             alignItems: 'center',
             color: '#FFFFFF',
             fontFamily: '"Space Mono", monospace',
             fontWeight: 'bold',
-            fontSize: 'clamp(0.6rem, 2.3cqw, 1.05rem)',
+            fontSize: 'clamp(0.55rem, 2cqw, 0.95rem)',
             textTransform: 'uppercase',
             letterSpacing: '1px',
             whiteSpace: 'nowrap',
@@ -78,19 +78,19 @@ export default function LivePreview({
             {name || 'YOUR NAME'}
           </div>
 
-          {/* Skill Box: Placed to the right of the "Skill" label */}
+          {/* Skill Box: Right side of Skill label */}
           <div style={{
             position: 'absolute',
             top: '70.2%',
-            left: '34%',
-            width: '50%',
+            left: '40%',
+            width: '44%',
             height: '4.5%',
             display: 'flex',
             alignItems: 'center',
             color: '#FFFFFF',
             fontFamily: '"Space Mono", monospace',
             fontWeight: 'bold',
-            fontSize: 'clamp(0.55rem, 2.1cqw, 0.95rem)',
+            fontSize: 'clamp(0.5rem, 1.8cqw, 0.85rem)',
             textTransform: 'uppercase',
             letterSpacing: '1px',
             whiteSpace: 'nowrap',

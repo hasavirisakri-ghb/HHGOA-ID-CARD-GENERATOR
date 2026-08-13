@@ -12,7 +12,6 @@ export default function ResultPage() {
     if (dataUrl) {
       setCardUrl(dataUrl);
     } else {
-      // If no card in session, go back home
       router.push('/');
     }
   }, [router]);
@@ -46,14 +45,14 @@ export default function ResultPage() {
         <img src={cardUrl} alt="Your Builder Pass" style={{ width: '100%', height: 'auto', display: 'block' }} />
       </div>
 
-      <div className="action-buttons">
-        <button className="btn btn-dark" onClick={handleDownload} style={{ minWidth: '200px' }}>
+      <div className="result-actions-row">
+        <button className="btn btn-primary result-btn" onClick={handleDownload}>
           ⬇ Download Pass
         </button>
-        <button className="btn btn-dark" onClick={handleShare} style={{ background: '#fff', color: '#000', minWidth: '200px' }}>
+        <button className="btn btn-share result-btn" onClick={handleShare}>
           ✕ Share to X
         </button>
-        <button className="btn btn-dark" onClick={() => router.push('/')} style={{ background: 'transparent', minWidth: '200px' }}>
+        <button className="btn btn-secondary result-btn" onClick={() => router.push('/')}>
           ↻ Generate Another Pass
         </button>
       </div>
