@@ -7,25 +7,23 @@ import FloatingStickers from '../components/FloatingStickers';
 import TemplateSelector from '../components/TemplateSelector';
 import Controls from '../components/Controls';
 import LivePreview from '../components/LivePreview';
-import { renderBuilderCard } from '../lib/cardRenderer';
 import { renderFrame } from '../lib/frameRenderer';
 import { templates } from '../lib/templates';
 
 export default function Home() {
   const router = useRouter();
-  
-  const [activeFormat, setActiveFormat] = useState('ID_CARD'); // 'ID_CARD' | 'PFP_FRAME'
+
   const [selectedTemplate, setSelectedTemplate] = useState(templates[0]);
-  
+
   const [userImage, setUserImage] = useState(null);
   const [zoom, setZoom] = useState(1);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
-  
+
   const [name, setName] = useState('');
-  const [skill, setSkill] = useState('');
-  const [title, setTitle] = useState('');
-  const [handle, setHandle] = useState('');
+
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState(null);
 
   const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
     setCroppedAreaPixels(croppedAreaPixels);
@@ -33,72 +31,64 @@ export default function Home() {
 
   const handleGenerate = async () => {
     if (!userImage) {
-      alert("Please upload a photo first!");
+      setError('Please upload a photo first!');
       return;
     }
+    setError(null);
+    setIsGenerating(true);
 
-    await new Promise(r => setTimeout(r, 100));
+    try {
+      // Make sure the branded fonts (Playfair Display / Space Mono) used by the
+      // canvas text are actually loaded before we draw, otherwise the first
+      // generate of a session can silently fall back to a system font.
+      if (typeof document !== 'undefined' && document.fonts?.ready) {
+        await document.fonts.ready;
+      }
 
-    let cardDataUrl;
-    if (activeFormat === 'PFP_FRAME') {
       const canvas = document.createElement('canvas');
       await renderFrame(canvas, {
         userImage,
         croppedAreaPixels,
         templateSrc: selectedTemplate.src,
+        photoRadius: selectedTemplate.photoRadius,
         name,
-        handle
       });
-      cardDataUrl = canvas.toDataURL('image/png');
-      sessionStorage.setItem('hhgoa_format_type', 'PFP_FRAME');
-    } else {
-      cardDataUrl = await renderBuilderCard({
-        userImage,
-        croppedAreaPixels,
-        name,
-        skill,
-        title
-      });
-      sessionStorage.setItem('hhgoa_format_type', 'ID_CARD');
-    }
+      const cardDataUrl = canvas.toDataURL('image/png');
 
-    sessionStorage.setItem('hhgoa_generated_card', cardDataUrl);
-    router.push('/result');
+      sessionStorage.setItem('hhgoa_generated_card', cardDataUrl);
+      router.push('/result');
+    } catch (err) {
+      console.error(err);
+      setError('Something went wrong generating your PFP. Please try again.');
+      setIsGenerating(false);
+    }
   };
 
   return (
     <div className="app-layout">
       <FloatingStickers />
-      <Header activeFormat={activeFormat} onFormatChange={setActiveFormat} />
-      
-      {activeFormat === 'PFP_FRAME' && (
-        <div className="glass-panel template-section animate-fade-in">
-          <TemplateSelector 
-            selectedId={selectedTemplate.id} 
-            onSelect={(id) => setSelectedTemplate(templates.find(t => t.id === id))} 
-          />
-        </div>
-      )}
+      <Header />
+
+      <div className="glass-panel template-section animate-fade-in">
+        <TemplateSelector
+          selectedId={selectedTemplate.id}
+          onSelect={(id) => setSelectedTemplate(templates.find((t) => t.id === id))}
+        />
+      </div>
 
       <div className="glass-panel main-content">
-        <Controls 
-          activeFormat={activeFormat}
-          onImageUpload={setUserImage} 
+        <Controls
+          onImageUpload={setUserImage}
           zoom={zoom}
           onZoomChange={setZoom}
           name={name}
           onNameChange={setName}
-          skill={skill}
-          onSkillChange={setSkill}
-          title={title}
-          onTitleChange={setTitle}
-          handle={handle}
-          onHandleChange={setHandle}
           onGenerate={handleGenerate}
+          isGenerating={isGenerating}
+          error={error}
         />
-        
-        <LivePreview 
-          activeFormat={activeFormat}
+
+        <LivePreview
           selectedTemplate={selectedTemplate}
           userImage={userImage}
           zoom={zoom}
@@ -107,9 +97,6 @@ export default function Home() {
           onCropChange={setCrop}
           onCropComplete={onCropComplete}
           name={name}
-          skill={skill}
-          title={title}
-          handle={handle}
         />
       </div>
 

@@ -2,161 +2,125 @@
 
 import { useRef, useState } from 'react';
 
-export default function Controls({ 
-  activeFormat = 'ID_CARD',
-  onImageUpload, 
-  zoom, 
+export default function Controls({
+  onImageUpload,
+  zoom,
   onZoomChange,
-  name, 
-  onNameChange, 
-  skill, 
-  onSkillChange,
-  title,
-  onTitleChange,
-  handle,
-  onHandleChange,
-  onGenerate 
+  name,
+  onNameChange,
+  onGenerate,
+  isGenerating,
+  error,
 }) {
   const fileInputRef = useRef(null);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isConverting, setIsConverting] = useState(false);
+  const [uploadError, setUploadError] = useState(null);
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    setUploadError(null);
 
-    if (file.type === 'image/heic' || file.name.toLowerCase().endsWith('.heic')) {
-      const heic2any = (await import('heic2any')).default;
-      const converted = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.8 });
-      onImageUpload(URL.createObjectURL(converted));
-    } else {
-      onImageUpload(URL.createObjectURL(file));
+    try {
+      const isHeic = file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic');
+
+      if (isHeic) {
+        setIsConverting(true);
+        const heic2any = (await import('heic2any')).default;
+        const converted = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.85 });
+        const blob = Array.isArray(converted) ? converted[0] : converted;
+        onImageUpload(URL.createObjectURL(blob));
+      } else if (file.type.startsWith('image/')) {
+        onImageUpload(URL.createObjectURL(file));
+      } else {
+        setUploadError('Please choose an image file (JPG, PNG, WEBP or HEIC).');
+      }
+    } catch (err) {
+      console.error(err);
+      setUploadError('Could not read that photo. Try a different file.');
+    } finally {
+      setIsConverting(false);
+      // allow re-selecting the same file
+      e.target.value = '';
     }
   };
 
-  const handleGenerateClick = async () => {
-    setIsGenerating(true);
-    await onGenerate();
-    setIsGenerating(false);
-  };
-
-  const isPfp = activeFormat === 'PFP_FRAME';
-
   return (
     <div className="controls-panel animate-fade-in">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '0.75rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+      <div className="controls-header">
         <h2 className="section-title" style={{ margin: 0 }}>
-          {isPfp ? '📷 EDITABLE PFP CONTROLS' : '📷 EDITABLE CARD CONTROLS'}
+          📷 EDITABLE PFP CONTROLS
         </h2>
-        <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', fontFamily: 'Space Mono' }}>
-          {isPfp ? '1080×1080 FINAL PFP' : '2048×2048 FINAL ID'}
-        </span>
+        <span className="controls-meta">1080×1080 FINAL PFP</span>
       </div>
-      
+
       <div className="control-group">
-        <label className="control-label">📷 PHOTO CONTROLS</label>
-        <input 
-          type="file" 
-          ref={fileInputRef} 
-          onChange={handleFileChange} 
-          accept="image/png, image/jpeg, image/webp, image/heic, .heic" 
-          className="hidden" 
+        <label className="control-label" htmlFor="photo-upload">📷 PHOTO CONTROLS</label>
+        <input
+          type="file"
+          id="photo-upload"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          accept="image/png, image/jpeg, image/webp, image/heic, image/heif, .heic, .heif"
+          className="hidden"
         />
-        <div 
-          className="upload-dropzone" 
+        <div
+          className="upload-dropzone"
+          role="button"
+          tabIndex={0}
           onClick={() => fileInputRef.current.click()}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') fileInputRef.current.click(); }}
         >
-          <span className="upload-icon">↑</span>
-          <span className="upload-text">Upload Photo</span>
+          <span className="upload-icon">{isConverting ? '⏳' : '↑'}</span>
+          <span className="upload-text">{isConverting ? 'Converting HEIC…' : 'Upload Photo'}</span>
         </div>
-        <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)', textAlign: 'center', marginTop: '0.4rem' }}>
-          Supports JPG, PNG, WEBP & HEIC (iPhone)
-        </div>
-        
+        <div className="control-hint">Supports JPG, PNG, WEBP &amp; HEIC (iPhone)</div>
+        {uploadError && <div className="control-error" role="alert">{uploadError}</div>}
+
         <div style={{ marginTop: '1rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'rgba(255,255,255,0.7)', marginBottom: '0.3rem' }}>
-            <span>Zoom</span>
+          <div className="zoom-row">
+            <label htmlFor="zoom-slider">Zoom</label>
             <span>{Math.round(zoom * 100)}%</span>
           </div>
-          <input 
-            type="range" 
-            min="0.1" 
-            max="3" 
-            step="0.05" 
-            value={zoom} 
+          <input
+            type="range"
+            id="zoom-slider"
+            min="1"
+            max="3"
+            step="0.05"
+            value={zoom}
             onChange={(e) => onZoomChange(Number(e.target.value))}
             className="zoom-slider"
+            aria-label="Zoom photo"
           />
         </div>
-        <span className="tip-text">💡 Tip: Click & drag directly on the photo frame to pan. Scroll to zoom!</span>
+        <span className="tip-text">💡 Tip: Drag directly on the photo to reposition. Pinch or scroll to zoom!</span>
       </div>
 
-      <div className="control-group">
-        <label className="control-label">👤 YOUR NAME</label>
+      <div className="control-group" style={{ borderBottom: 'none' }}>
+        <label className="control-label" htmlFor="name-input">👤 YOUR NAME</label>
         <div className="input-with-icon">
-          <span className="input-icon">👤</span>
-          <input 
-            type="text" 
-            placeholder="Enter your name" 
-            value={name} 
-            onChange={(e) => onNameChange(e.target.value)} 
+          <span className="input-icon" aria-hidden="true">👤</span>
+          <input
+            type="text"
+            id="name-input"
+            placeholder="Enter your name (optional)"
+            value={name}
+            onChange={(e) => onNameChange(e.target.value)}
             maxLength={20}
+            autoComplete="name"
           />
         </div>
       </div>
 
-      {isPfp ? (
-        <div className="control-group" style={{ borderBottom: 'none' }}>
-          <label className="control-label">🌐 SOCIAL HANDLE</label>
-          <div className="input-with-icon">
-            <span className="input-icon">@</span>
-            <input 
-              type="text" 
-              placeholder="e.g. twitter_handle" 
-              value={handle} 
-              onChange={(e) => onHandleChange(e.target.value)} 
-              maxLength={20}
-            />
-          </div>
-        </div>
-      ) : (
-        <>
-          <div className="control-group">
-            <label className="control-label">🔑 SKILL / STACK</label>
-            <div className="input-with-icon">
-              <span className="input-icon">🔑</span>
-              <input 
-                type="text" 
-                placeholder="Enter your skill / stack" 
-                value={skill} 
-                onChange={(e) => onSkillChange(e.target.value)} 
-                maxLength={20}
-              />
-            </div>
-          </div>
+      {error && <div className="control-error" role="alert" style={{ marginBottom: '0.75rem' }}>{error}</div>}
 
-          <div className="control-group" style={{ borderBottom: 'none' }}>
-            <label className="control-label">🎗️ BUILDER TITLE</label>
-            <div className="input-with-icon">
-              <span className="input-icon">🎗️</span>
-              <input 
-                type="text" 
-                placeholder="Enter builder title" 
-                value={title} 
-                onChange={(e) => onTitleChange(e.target.value)} 
-                maxLength={20}
-              />
-            </div>
-          </div>
-        </>
-      )}
-
-      <button 
-        className="btn btn-primary btn-block btn-generate" 
-        onClick={handleGenerateClick}
-        disabled={isGenerating}
-        style={{ marginTop: '1.5rem', minHeight: '54px', fontSize: '1rem' }}
+      <button
+        className="btn btn-primary btn-block btn-generate"
+        onClick={onGenerate}
+        disabled={isGenerating || isConverting}
       >
-        <span className="lightning-icon">⚡</span> {isGenerating ? 'GENERATING...' : isPfp ? 'GENERATE PFP' : 'GENERATE PASS'}
+        <span className="lightning-icon">⚡</span> {isGenerating ? 'GENERATING…' : 'GENERATE PFP'}
       </button>
     </div>
   );
