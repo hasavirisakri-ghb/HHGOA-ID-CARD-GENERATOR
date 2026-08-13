@@ -11,6 +11,7 @@ export default function LivePreview({
   onCropChange,
   onCropComplete,
   name,
+  duotone,
 }) {
   const overlaySrc = selectedTemplate?.src || '/frames/tropical-cyber.webp';
   // Templates can punch their photo hole at a smaller radius than the 430/1080
@@ -51,6 +52,13 @@ export default function LivePreview({
               Upload a photo to preview your frame
             </span>
           </div>
+        )}
+
+        {duotone && (
+          <div
+            className="duotone-overlay"
+            style={{ pointerEvents: 'none' }}
+          />
         )}
 
         {/* Template Overlay */}
